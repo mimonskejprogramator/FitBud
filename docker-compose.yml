@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Backend API
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: fitbud-server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+      - fitbud-data:/app/data
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB_PATH=/app/data/fitbud.db
+    restart: unless-stopped
+    networks:
+      - fitbud-network
+
+  # Frontend React app
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: fitbud-client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - server
+    restart: unless-stopped
+    networks:
+      - fitbud-network
+
+volumes:
+  fitbud-data:
+    driver: local
+
+networks:
+  fitbud-network:
+    driver: bridge
+

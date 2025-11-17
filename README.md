@@ -19,7 +19,22 @@ Tohle je můj projekt FitBud – webová appka, ve které si můžu trackovat ka
 
 ## Jak spustit lokálně
 
-### Backend (server)
+### Varianta 1: Docker (doporučeno)
+```bash
+# Spuštění celé aplikace (backend + frontend + databáze)
+docker-compose up --build
+
+# Nebo na pozadí:
+docker-compose up -d
+
+# Zastavení:
+docker-compose down
+```
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:3000`
+
+### Varianta 2: Bez Dockeru
+**Backend (server)**
 ```bash
 cd server
 npm install
@@ -29,7 +44,7 @@ npm run dev
 ```
 Server poběží na `http://localhost:3000`
 
-### Frontend (client)
+**Frontend (client)**
 ```bash
 cd client
 npm install
@@ -39,8 +54,8 @@ Frontend poběží na `http://localhost:5173`
 
 ### První spuštění
 1. Naklonuj repo
-2. Nainstaluj závislosti pro server i client (viz výše)
-3. Spusť nejdřív server, pak client
+2. Ujisti se, že máš nainstalovaný Docker Desktop (nebo Node.js pro variantu bez Dockeru)
+3. Spusť `docker-compose up --build`
 4. Otevři prohlížeč na `http://localhost:5173`
 
 ## Struktura projektu
