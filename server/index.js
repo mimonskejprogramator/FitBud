@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import { initDatabase } from './database.js';
 
 // Načtení env proměnných
@@ -15,6 +16,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use(cookieParser());
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
