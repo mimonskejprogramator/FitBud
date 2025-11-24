@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { initDatabase } from './database.js';
+import authRoutes from './routes/auth.js';
 
 // Načtení env proměnných
 dotenv.config();
@@ -31,6 +32,9 @@ app.get('/api/health', (req, res) => {
 app.get('/', (req, res) => {
   res.json({ message: 'Vítej v FitBud API' });
 });
+
+// Auth routes
+app.use('/api/auth', authRoutes);
 
 // Spuštění serveru s inicializací databáze
 async function startServer() {
