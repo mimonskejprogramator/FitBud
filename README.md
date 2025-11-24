@@ -64,5 +64,28 @@ Frontend poběží na `http://localhost:5173`
   - `vite.config.js` – konfigurace Vite
 - `server/` – Express API a SQLite
   - `index.js` – hlavní soubor serveru
+  - `routes/` – API endpointy
+  - `middleware/` – JWT autentizace
+  - `utils/` – pomocné funkce (bcrypt)
   - `package.json` – závislosti backendu
 - `README.md` – dokumentace (průběžně doplňuju)
+
+## API Endpointy
+
+### Autentizace
+
+**Registrace**
+```bash
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"heslo123","name":"Test User"}'
+```
+
+**Přihlášení**
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"heslo123"}'
+```
+
+Odpověď obsahuje JWT token, který se používá pro autentizované requesty.
