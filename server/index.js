@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { initDatabase } from './database.js';
 import authRoutes from './routes/auth.js';
+import mealsRoutes from './routes/meals.js';
 
 // Načtení env proměnných
 dotenv.config();
@@ -35,6 +36,9 @@ app.get('/', (req, res) => {
 
 // Auth routes
 app.use('/api/auth', authRoutes);
+
+// Meals routes
+app.use('/api/meals', mealsRoutes);
 
 // Spuštění serveru s inicializací databáze
 async function startServer() {
