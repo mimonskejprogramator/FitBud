@@ -13,8 +13,9 @@ Tohle je můj projekt FitBud – webová appka, ve které si můžu trackovat ka
 ## Stack
 - Frontend: React (Vite)
 - Backend: Node.js + Express
-- DB: SQLite
-- Auth: JWT (httpOnly cookie)
+- DB: SQLite (běží v Docker containeru s persistent volume)
+- Auth: JWT tokens
+- Deployment: Docker + Docker Compose
 - (TS zvažuji tam, kde to dává value. Jinak čistý JS kvůli rychlosti práce.)
 
 ## Jak spustit lokálně
@@ -32,6 +33,7 @@ docker-compose down
 ```
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:3000`
+- Databáze: SQLite soubor je uložený v Docker volume `fitbud-data` pro perzistenci dat
 
 ### Varianta 2: Bez Dockeru
 **Backend (server)**
