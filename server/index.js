@@ -6,6 +6,7 @@ import { initDatabase } from './database.js';
 import authRoutes from './routes/auth.js';
 import mealsRoutes from './routes/meals.js';
 import workoutsRoutes from './routes/workouts.js';
+import sleepRoutes from './routes/sleep.js';
 
 // Načtení env proměnných
 dotenv.config();
@@ -43,6 +44,9 @@ app.use('/api/meals', mealsRoutes);
 
 // Workouts routes
 app.use('/api/workouts', workoutsRoutes);
+
+// Sleep routes
+app.use('/api/sleep', sleepRoutes);
 
 // Spuštění serveru s inicializací databáze
 async function startServer() {
