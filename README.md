@@ -91,3 +91,51 @@ curl -X POST http://localhost:3000/api/auth/login \
 ```
 
 Odpověď obsahuje JWT token, který se používá pro autentizované requesty.
+
+### Jídla (Meals)
+
+**Získání všech jídel**
+```bash
+curl -X GET http://localhost:3000/api/meals \
+  -H "Authorization: Bearer <token>"
+```
+
+**Přidání jídla**
+```bash
+curl -X POST http://localhost:3000/api/meals \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Snídaně","calories":450,"protein":20,"carbs":50,"fats":15,"meal_date":"2024-12-01","meal_time":"08:00"}'
+```
+
+### Tréninky (Workouts)
+
+**Získání všech tréninků**
+```bash
+curl -X GET http://localhost:3000/api/workouts \
+  -H "Authorization: Bearer <token>"
+```
+
+**Přidání tréninku**
+```bash
+curl -X POST http://localhost:3000/api/workouts \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Běh","type":"cardio","duration_minutes":30,"calories_burned":300,"workout_date":"2024-12-01","workout_time":"07:00"}'
+```
+
+### Spánek (Sleep)
+
+**Získání všech záznamů spánku**
+```bash
+curl -X GET http://localhost:3000/api/sleep \
+  -H "Authorization: Bearer <token>"
+```
+
+**Přidání záznamu spánku**
+```bash
+curl -X POST http://localhost:3000/api/sleep \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"sleep_date":"2024-12-01","bedtime":"23:00","wake_time":"07:00","duration_hours":8,"quality":4}'
+```
