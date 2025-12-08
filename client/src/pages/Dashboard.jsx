@@ -4,6 +4,13 @@ import { useNavigate } from 'react-router-dom';
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    todayMeals: [],
+    todayWorkouts: [],
+    todaySleep: null,
+    totalCaloriesIn: 0,
+    totalCaloriesOut: 0
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,13 +27,54 @@ function Dashboard() {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       setUser(payload);
-      setLoading(false);
+      loadTodayStats(token);
     } catch (err) {
       console.error('Chyba při dekódování tokenu:', err);
       localStorage.removeItem('token');
       navigate('/login');
     }
   }, [navigate]);
+
+  const loadTodayStats = async (token) => {
+    try {
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+      // Načtení jídel
+      const mealsRes = await fetch('http://localhost:3000/api/meals', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const mealsData = await mealsRes.json();
+      const todayMeals = mealsData.meals.filter(m => m.meal_date === today);
+      const totalCaloriesIn = todayMeals.reduce((sum, m) => sum + m.calories, 0);
+
+      // Načtení tréninků
+      const workoutsRes = await fetch('http://localhost:3000/api/workouts', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const workoutsData = await workoutsRes.json();
+      const todayWorkouts = workoutsData.workouts.filter(w => w.workout_date === today);
+      const totalCaloriesOut = todayWorkouts.reduce((sum, w) => sum + (w.calories_burned || 0), 0);
+
+      // Načtení spánku
+      const sleepRes = await fetch('http://localhost:3000/api/sleep', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const sleepData = await sleepRes.json();
+      const todaySleep = sleepData.sleep.find(s => s.sleep_date === today);
+
+      setStats({
+        todayMeals,
+        todayWorkouts,
+        todaySleep,
+        totalCaloriesIn,
+        totalCaloriesOut
+      });
+      setLoading(false);
+    } catch (err) {
+      console.error('Chyba při načítání statistik:', err);
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -96,8 +144,13 @@ function Dashboard() {
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
           <h2 style={{ marginTop: 0 }}>🍽️ Jídla</h2>
-          <p style={{ color: '#666' }}>Evidence výživy a kalorií</p>
-          <p style={{ fontSize: '14px', color: '#999' }}>Připravuje se...</p>
+          <p style={{ color: '#666', marginBottom: '15px' }}>Dnešní příjem kalorií</p>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#28a745' }}>
+            {stats.totalCaloriesIn} kcal
+          </div>
+          <p style={{ fontSize: '14px', color: '#999', marginTop: '10px' }}>
+            {stats.todayMeals.length} jídel dnes
+          </p>
         </div>
 
         {/* Karta - Tréninky */}
@@ -109,8 +162,13 @@ function Dashboard() {
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
           <h2 style={{ marginTop: 0 }}>💪 Tréninky</h2>
-          <p style={{ color: '#666' }}>Sledování cvičení</p>
-          <p style={{ fontSize: '14px', color: '#999' }}>Připravuje se...</p>
+          <p style={{ color: '#666', marginBottom: '15px' }}>Spálené kalorie</p>
+          <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#dc3545' }}>
+            {stats.totalCaloriesOut} kcal
+          </div>
+          <p style={{ fontSize: '14px', color: '#999', marginTop: '10px' }}>
+            {stats.todayWorkouts.length} tréninků dnes
+          </p>
         </div>
 
         {/* Karta - Spánek */}
@@ -122,8 +180,19 @@ function Dashboard() {
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
           <h2 style={{ marginTop: 0 }}>😴 Spánek</h2>
-          <p style={{ color: '#666' }}>Monitoring odpočinku</p>
-          <p style={{ fontSize: '14px', color: '#999' }}>Připravuje se...</p>
+          <p style={{ color: '#666', marginBottom: '15px' }}>Dnešní spánek</p>
+          {stats.todaySleep ? (
+            <>
+              <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#007bff' }}>
+                {stats.todaySleep.duration_hours}h
+              </div>
+              <p style={{ fontSize: '14px', color: '#999', marginTop: '10px' }}>
+                Kvalita: {stats.todaySleep.quality}/5 ⭐
+              </p>
+            </>
+          ) : (
+            <p style={{ fontSize: '14px', color: '#999' }}>Zatím nezaznamenáno</p>
+          )}
         </div>
       </div>
 
