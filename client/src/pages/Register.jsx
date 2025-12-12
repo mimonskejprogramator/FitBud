@@ -97,6 +97,7 @@ function Register() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
+            placeholder="Minimálně 6 znaků"
             style={{
               width: '100%',
               padding: '10px',
