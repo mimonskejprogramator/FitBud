@@ -56,21 +56,22 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { name, calories, protein, carbs, fats, meal_date, meal_time, notes } = req.body;
-    
-    // Validace
+
+    // Validace povinných polí
     if (!name || !calories || !meal_date) {
-      return res.status(400).json({ 
-        error: 'Název, kalorie a datum jsou povinné' 
+      return res.status(400).json({
+        error: 'Název, kalorie a datum jsou povinné'
       });
     }
-    
+
     const db = getDatabase();
+    // Vložení do databáze - protein, carbs, fats jsou optional
     const result = await db.run(
       `INSERT INTO meals (user_id, name, calories, protein, carbs, fats, meal_date, meal_time, notes)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [req.user.id, name, calories, protein || 0, carbs || 0, fats || 0, meal_date, meal_time, notes]
     );
-    
+
     res.status(201).json({
       message: 'Jídlo přidáno',
       meal: {

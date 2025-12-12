@@ -35,19 +35,22 @@ function Dashboard() {
     }
   }, [navigate]);
 
+  // Načtení dnešních dat ze serveru
   const loadTodayStats = async (token) => {
     try {
-      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const today = new Date().toISOString().split('T')[0]; // formát YYYY-MM-DD
 
-      // Načtení jídel
+      // Načtení jídel z API
       const mealsRes = await fetch('http://localhost:3000/api/meals', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const mealsData = await mealsRes.json();
       const todayMeals = mealsData.meals.filter(m => m.meal_date === today);
+
+      // Sečtení kalorií - reduce je fakt užitečný
       const totalCaloriesIn = todayMeals.reduce((sum, m) => sum + m.calories, 0);
 
-      // Načtení tréninků
+      // Tréninky
       const workoutsRes = await fetch('http://localhost:3000/api/workouts', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -55,7 +58,7 @@ function Dashboard() {
       const todayWorkouts = workoutsData.workouts.filter(w => w.workout_date === today);
       const totalCaloriesOut = todayWorkouts.reduce((sum, w) => sum + (w.calories_burned || 0), 0);
 
-      // Načtení spánku
+      // Spánek - tady používám find místo filter, protože je jen jeden záznam za den
       const sleepRes = await fetch('http://localhost:3000/api/sleep', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -196,7 +199,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Info box */}
+      {/* Info box - TODO: přidat grafy */}
       <div style={{
         padding: '20px',
         background: '#e7f3ff',
@@ -205,7 +208,7 @@ function Dashboard() {
         textAlign: 'center'
       }}>
         <p style={{ margin: 0, color: '#004085' }}>
-          📊 Dashboard je ve vývoji. Brzy zde uvidíš statistiky a grafy!
+          📊 Brzy zde přidám grafy a týdenní statistiky!
         </p>
       </div>
     </div>

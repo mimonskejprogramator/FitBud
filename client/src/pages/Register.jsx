@@ -15,6 +15,7 @@ function Register() {
     setLoading(true);
 
     try {
+      // Registrace nového uživatele
       const response = await fetch('http://localhost:3000/api/auth/register', {
         method: 'POST',
         headers: {
@@ -29,10 +30,10 @@ function Register() {
         throw new Error(data.error || 'Registrace selhala');
       }
 
-      // Uložení tokenu do localStorage
+      // Po registraci se automaticky přihlásí (dostanu token)
       localStorage.setItem('token', data.token);
 
-      // Přesměrování na dashboard
+      // Redirect
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

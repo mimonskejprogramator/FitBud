@@ -1,141 +1,77 @@
-# FitBud 
+# FitBud 🏋️
 
-Tohle je můj projekt FitBud – webová appka, ve které si můžu trackovat kalorie, tréninky a spánek. Chci mít jednoduchý dashboard, kde uvidím denní přehledy a poslední aktivity. 
+Webová aplikace pro sledování zdravého životního stylu - kalorie, tréninky a spánek.
 
-## Funkce (MVP)
-- Uživatelské účty (registrace/přihlášení) – email + heslo
-- Tracking kalorií (CRUD)
-- Tracking tréninku (CRUD)
-- Tracking spánku (CRUD)
-- Dashboard s denním souhrnem
-- Export dat do CSV
+## O projektu
 
-## Stack
-- Frontend: React (Vite)
-- Backend: Node.js + Express
-- DB: SQLite (běží v Docker containeru s persistent volume)
-- Auth: JWT tokens
-- Deployment: Docker + Docker Compose
-- (TS zvažuji tam, kde to dává value. Jinak čistý JS kvůli rychlosti práce.)
+FitBud je moje ročníková práce, která kombinuje tracking výživy, fyzické aktivity a spánku do jedné aplikace. Cílem je mít přehledný dashboard s denními statistikami a možností dlouhodobě sledovat pokrok.
 
-## Jak spustit lokálně
+## Hlavní funkce
 
-### Varianta 1: Docker (doporučeno)
-```bash
-# Spuštění celé aplikace (backend + frontend + databáze)
-docker-compose up --build
+- 👤 Uživatelské účty (registrace/přihlášení)
+- 🍽️ Evidence jídel a kalorií
+- 💪 Tracking tréninků
+- 😴 Sledování spánku
+- 📊 Dashboard s denním přehledem
 
-# Nebo na pozadí:
-docker-compose up -d
+## Technologie
 
-# Zastavení:
-docker-compose down
-```
-- Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:3000`
-- Databáze: SQLite soubor je uložený v Docker volume `fitbud-data` pro perzistenci dat
+**Frontend:**
+- React 18 + Vite
+- React Router pro navigaci
+- Inline styles (plánuju přejít na Tailwind)
 
-### Varianta 2: Bez Dockeru
-**Backend (server)**
-```bash
-cd server
-npm install
-npm start
-# nebo pro dev režim s auto-reloadem:
-npm run dev
-```
-Server poběží na `http://localhost:3000`
+**Backend:**
+- Node.js + Express
+- SQLite databáze
+- JWT autentizace
+- bcrypt pro hashování hesel
 
-**Frontend (client)**
-```bash
-cd client
-npm install
-npm run dev
-```
-Frontend poběží na `http://localhost:5173`
-
-### První spuštění
-1. Naklonuj repo
-2. Ujisti se, že máš nainstalovaný Docker Desktop (nebo Node.js pro variantu bez Dockeru)
-3. Spusť `docker-compose up --build`
-4. Otevři prohlížeč na `http://localhost:5173`
+**Deployment:**
+- Docker + Docker Compose
+- Persistent volume pro databázi
 
 ## Struktura projektu
-- `client/` – React SPA (Vite)
-  - `src/` – zdrojové soubory React komponent
-  - `vite.config.js` – konfigurace Vite
-- `server/` – Express API a SQLite
-  - `index.js` – hlavní soubor serveru
-  - `routes/` – API endpointy
-  - `middleware/` – JWT autentizace
-  - `utils/` – pomocné funkce (bcrypt)
-  - `package.json` – závislosti backendu
-- `README.md` – dokumentace (průběžně doplňuju)
 
-## API Endpointy
-
-### Autentizace
-
-**Registrace**
-```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"heslo123","name":"Test User"}'
+```
+FitBud/
+├── client/          # React frontend
+│   ├── src/
+│   │   ├── pages/   # Login, Register, Dashboard
+│   │   └── App.jsx
+│   └── package.json
+├── server/          # Express backend
+│   ├── routes/      # API endpointy
+│   ├── middleware/  # JWT auth
+│   ├── database.js
+│   └── index.js
+└── docker-compose.yml
 ```
 
-**Přihlášení**
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"heslo123"}'
+## API Dokumentace
+
+Kompletní API dokumentace je dostupná po spuštění serveru na `http://localhost:3000/api/health`
+
+### Základní endpointy:
+
+- `POST /api/auth/register` - Registrace
+- `POST /api/auth/login` - Přihlášení
+- `GET /api/meals` - Seznam jídel (vyžaduje JWT)
+- `POST /api/meals` - Přidání jídla (vyžaduje JWT)
+- `GET /api/workouts` - Seznam tréninků (vyžaduje JWT)
+- `POST /api/workouts` - Přidání tréninku (vyžaduje JWT)
+- `GET /api/sleep` - Záznamy spánku (vyžaduje JWT)
+- `POST /api/sleep` - Přidání záznamu (vyžaduje JWT)
+
+Všechny endpointy kromě autentizace vyžadují JWT token v hlavičce:
+```
+Authorization: Bearer <token>
 ```
 
-Odpověď obsahuje JWT token, který se používá pro autentizované requesty.
+## TODO
 
-### Jídla (Meals)
-
-**Získání všech jídel**
-```bash
-curl -X GET http://localhost:3000/api/meals \
-  -H "Authorization: Bearer <token>"
-```
-
-**Přidání jídla**
-```bash
-curl -X POST http://localhost:3000/api/meals \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Snídaně","calories":450,"protein":20,"carbs":50,"fats":15,"meal_date":"2024-12-01","meal_time":"08:00"}'
-```
-
-### Tréninky (Workouts)
-
-**Získání všech tréninků**
-```bash
-curl -X GET http://localhost:3000/api/workouts \
-  -H "Authorization: Bearer <token>"
-```
-
-**Přidání tréninku**
-```bash
-curl -X POST http://localhost:3000/api/workouts \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Běh","type":"cardio","duration_minutes":30,"calories_burned":300,"workout_date":"2024-12-01","workout_time":"07:00"}'
-```
-
-### Spánek (Sleep)
-
-**Získání všech záznamů spánku**
-```bash
-curl -X GET http://localhost:3000/api/sleep \
-  -H "Authorization: Bearer <token>"
-```
-
-**Přidání záznamu spánku**
-```bash
-curl -X POST http://localhost:3000/api/sleep \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"sleep_date":"2024-12-01","bedtime":"23:00","wake_time":"07:00","duration_hours":8,"quality":4}'
-```
+- [ ] Grafy a statistiky
+- [ ] Export dat do CSV
+- [ ] Mobilní responzivita
+- [ ] Dark mode
+- [ ] Notifikace a připomínky

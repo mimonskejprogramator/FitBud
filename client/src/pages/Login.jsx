@@ -8,12 +8,14 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Funkce pro odeslání formuláře
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
+      // TODO: možná bych měl dát API URL do .env souboru
       const response = await fetch('http://localhost:3000/api/auth/login', {
         method: 'POST',
         headers: {
@@ -28,10 +30,10 @@ function Login() {
         throw new Error(data.error || 'Přihlášení selhalo');
       }
 
-      // Uložení tokenu do localStorage
+      // Uložení tokenu - funguje dobře
       localStorage.setItem('token', data.token);
 
-      // Přesměrování na dashboard
+      // Redirect na dashboard
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
