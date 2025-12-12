@@ -49,8 +49,8 @@ function Register() {
       padding: '20px',
       fontFamily: 'system-ui, sans-serif'
     }}>
-      <h1 style={{ textAlign: 'center' }}>🏋️ FitBud</h1>
-      <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>Registrace</h2>
+      <h1 style={{ textAlign: 'center', color: '#333' }}>FitBud</h1>
+      <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#666' }}>Registrace</h2>
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '15px' }}>

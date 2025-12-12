@@ -110,7 +110,7 @@ function Dashboard() {
         borderRadius: '8px'
       }}>
         <div>
-          <h1 style={{ margin: '0 0 5px 0' }}>🏋️ FitBud Dashboard</h1>
+          <h1 style={{ margin: '0 0 5px 0', color: '#333' }}>FitBud Dashboard</h1>
           <p style={{ margin: 0, color: '#666' }}>
             Vítej zpět, <strong>{user?.email}</strong>!
           </p>
@@ -146,7 +146,7 @@ function Dashboard() {
           borderRadius: '8px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
-          <h2 style={{ marginTop: 0 }}>🍽️ Jídla</h2>
+          <h2 style={{ marginTop: 0, color: '#28a745' }}>Jídla</h2>
           <p style={{ color: '#666', marginBottom: '15px' }}>Dnešní příjem kalorií</p>
           <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#28a745' }}>
             {stats.totalCaloriesIn} kcal
@@ -164,7 +164,7 @@ function Dashboard() {
           borderRadius: '8px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
-          <h2 style={{ marginTop: 0 }}>💪 Tréninky</h2>
+          <h2 style={{ marginTop: 0, color: '#dc3545' }}>Tréninky</h2>
           <p style={{ color: '#666', marginBottom: '15px' }}>Spálené kalorie</p>
           <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#dc3545' }}>
             {stats.totalCaloriesOut} kcal
@@ -182,7 +182,7 @@ function Dashboard() {
           borderRadius: '8px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
         }}>
-          <h2 style={{ marginTop: 0 }}>😴 Spánek</h2>
+          <h2 style={{ marginTop: 0, color: '#007bff' }}>Spánek</h2>
           <p style={{ color: '#666', marginBottom: '15px' }}>Dnešní spánek</p>
           {stats.todaySleep ? (
             <>
@@ -190,7 +190,7 @@ function Dashboard() {
                 {stats.todaySleep.duration_hours}h
               </div>
               <p style={{ fontSize: '14px', color: '#999', marginTop: '10px' }}>
-                Kvalita: {stats.todaySleep.quality}/5 ⭐
+                Kvalita: {stats.todaySleep.quality}/5
               </p>
             </>
           ) : (
@@ -207,8 +207,8 @@ function Dashboard() {
         borderRadius: '8px',
         textAlign: 'center'
       }}>
-        <p style={{ margin: 0, color: '#004085' }}>
-          📊 Brzy zde přidám grafy a týdenní statistiky!
+        <p style={{ margin: 0, color: '#004085', fontWeight: '500' }}>
+          Brzy zde přidám grafy a týdenní statistiky!
         </p>
       </div>
     </div>

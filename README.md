@@ -1,4 +1,4 @@
-# FitBud 🏋️
+# FitBud
 
 Webová aplikace pro sledování zdravého životního stylu - kalorie, tréninky a spánek.
 
@@ -8,11 +8,11 @@ FitBud je moje ročníková práce, která kombinuje tracking výživy, fyzické
 
 ## Hlavní funkce
 
-- 👤 Uživatelské účty (registrace/přihlášení)
-- 🍽️ Evidence jídel a kalorií
-- 💪 Tracking tréninků
-- 😴 Sledování spánku
-- 📊 Dashboard s denním přehledem
+- Uživatelské účty (registrace/přihlášení)
+- Evidence jídel a kalorií
+- Tracking tréninků
+- Sledování spánku
+- Dashboard s denním přehledem
 
 ## Technologie
 
