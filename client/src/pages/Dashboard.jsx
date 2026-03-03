@@ -154,6 +154,21 @@ function Dashboard() {
           <p style={{ fontSize: '14px', color: '#999', marginTop: '10px' }}>
             {stats.todayMeals.length} jídel dnes
           </p>
+          <button
+            onClick={() => navigate('/meals/add')}
+            style={{
+              marginTop: '15px',
+              padding: '8px 16px',
+              background: '#28a745',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            + Přidat jídlo
+          </button>
         </div>
 
         {/* Karta - Tréninky */}
