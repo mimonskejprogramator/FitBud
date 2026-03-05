@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AddMeal from './pages/AddMeal';
+import EditMeal from './pages/EditMeal';
 import Meals from './pages/Meals';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/meals" element={<Meals />} />
         <Route path="/meals/add" element={<AddMeal />} />
+        <Route path="/meals/edit/:id" element={<EditMeal />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>

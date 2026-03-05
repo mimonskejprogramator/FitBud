@@ -46,6 +46,32 @@ function Meals() {
     }
   };
 
+  // Funkce pro smazání jídla
+  const handleDelete = async (id) => {
+    if (!confirm('Opravdu chceš smazat toto jídlo?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:3000/api/meals/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Nepodařilo se smazat jídlo');
+      }
+
+      // Znovu načíst seznam
+      loadMeals();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('cs-CZ');
@@ -184,6 +210,38 @@ function Meals() {
                         {meal.notes}
                       </p>
                     )}
+                  </div>
+
+                  {/* Tlačítka pro akce */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginLeft: '15px' }}>
+                    <button
+                      onClick={() => navigate(`/meals/edit/${meal.id}`)}
+                      style={{
+                        padding: '6px 12px',
+                        background: '#007bff',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      Upravit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(meal.id)}
+                      style={{
+                        padding: '6px 12px',
+                        background: '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      Smazat
+                    </button>
                   </div>
                 </div>
               </div>
