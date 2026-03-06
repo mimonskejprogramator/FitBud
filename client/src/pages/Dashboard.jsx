@@ -187,6 +187,21 @@ function Dashboard() {
           <p style={{ fontSize: '14px', color: '#999', marginTop: '10px' }}>
             {stats.todayWorkouts.length} tréninků dnes
           </p>
+          <button
+            onClick={() => navigate('/workouts/add')}
+            style={{
+              marginTop: '15px',
+              padding: '8px 16px',
+              background: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            + Přidat trénink
+          </button>
         </div>
 
         {/* Karta - Spánek */}
