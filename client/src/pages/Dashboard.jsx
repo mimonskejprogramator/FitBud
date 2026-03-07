@@ -187,21 +187,36 @@ function Dashboard() {
           <p style={{ fontSize: '14px', color: '#999', marginTop: '10px' }}>
             {stats.todayWorkouts.length} tréninků dnes
           </p>
-          <button
-            onClick={() => navigate('/workouts/add')}
-            style={{
-              marginTop: '15px',
-              padding: '8px 16px',
-              background: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            + Přidat trénink
-          </button>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+            <button
+              onClick={() => navigate('/workouts')}
+              style={{
+                padding: '8px 16px',
+                background: '#6c757d',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              Zobrazit vše
+            </button>
+            <button
+              onClick={() => navigate('/workouts/add')}
+              style={{
+                padding: '8px 16px',
+                background: '#dc3545',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              + Přidat
+            </button>
+          </div>
         </div>
 
         {/* Karta - Spánek */}
