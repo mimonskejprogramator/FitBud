@@ -241,6 +241,21 @@ function Dashboard() {
           ) : (
             <p style={{ fontSize: '14px', color: '#999' }}>Zatím nezaznamenáno</p>
           )}
+          <button
+            onClick={() => navigate('/sleep/add')}
+            style={{
+              marginTop: '15px',
+              padding: '8px 16px',
+              background: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            + Přidat záznam
+          </button>
         </div>
       </div>
 
