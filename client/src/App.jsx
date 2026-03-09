@@ -8,6 +8,7 @@ import Meals from './pages/Meals';
 import AddWorkout from './pages/AddWorkout';
 import Workouts from './pages/Workouts';
 import AddSleep from './pages/AddSleep';
+import Sleep from './pages/Sleep';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/meals/edit/:id" element={<EditMeal />} />
         <Route path="/workouts" element={<Workouts />} />
         <Route path="/workouts/add" element={<AddWorkout />} />
+        <Route path="/sleep" element={<Sleep />} />
         <Route path="/sleep/add" element={<AddSleep />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>

@@ -241,21 +241,36 @@ function Dashboard() {
           ) : (
             <p style={{ fontSize: '14px', color: '#999' }}>Zatím nezaznamenáno</p>
           )}
-          <button
-            onClick={() => navigate('/sleep/add')}
-            style={{
-              marginTop: '15px',
-              padding: '8px 16px',
-              background: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            + Přidat záznam
-          </button>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+            <button
+              onClick={() => navigate('/sleep')}
+              style={{
+                padding: '8px 16px',
+                background: '#6c757d',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              Zobrazit vše
+            </button>
+            <button
+              onClick={() => navigate('/sleep/add')}
+              style={{
+                padding: '8px 16px',
+                background: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              + Přidat
+            </button>
+          </div>
         </div>
       </div>
 
