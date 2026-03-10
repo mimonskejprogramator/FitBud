@@ -9,10 +9,13 @@ import AddWorkout from './pages/AddWorkout';
 import Workouts from './pages/Workouts';
 import AddSleep from './pages/AddSleep';
 import Sleep from './pages/Sleep';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
     <BrowserRouter>
+      {/* Navbar se zobrazí na všech stránkách kromě login/register */}
+      <Navbar />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
