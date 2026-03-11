@@ -82,6 +82,12 @@ function Navbar() {
         >
           Spánek
         </button>
+        <button
+          onClick={() => navigate('/stats')}
+          style={navItemStyle('/stats')}
+        >
+          Statistiky
+        </button>
       </div>
 
       {/* Odhlášení */}

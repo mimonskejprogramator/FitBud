@@ -9,6 +9,7 @@ import AddWorkout from './pages/AddWorkout';
 import Workouts from './pages/Workouts';
 import AddSleep from './pages/AddSleep';
 import Sleep from './pages/Sleep';
+import Stats from './pages/Stats';
 import Navbar from './components/Navbar';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
         <Route path="/workouts/add" element={<AddWorkout />} />
         <Route path="/sleep" element={<Sleep />} />
         <Route path="/sleep/add" element={<AddSleep />} />
+        <Route path="/stats" element={<Stats />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
