@@ -10,6 +10,8 @@ import Workouts from './pages/Workouts';
 import AddSleep from './pages/AddSleep';
 import Sleep from './pages/Sleep';
 import Stats from './pages/Stats';
+import EditWorkout from './pages/EditWorkout';
+import EditSleep from './pages/EditSleep';
 import Navbar from './components/Navbar';
 
 function App() {
@@ -26,8 +28,10 @@ function App() {
         <Route path="/meals/edit/:id" element={<EditMeal />} />
         <Route path="/workouts" element={<Workouts />} />
         <Route path="/workouts/add" element={<AddWorkout />} />
+        <Route path="/workouts/edit/:id" element={<EditWorkout />} />
         <Route path="/sleep" element={<Sleep />} />
         <Route path="/sleep/add" element={<AddSleep />} />
+        <Route path="/sleep/edit/:id" element={<EditSleep />} />
         <Route path="/stats" element={<Stats />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
