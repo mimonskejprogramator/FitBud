@@ -26,6 +26,29 @@ function AddWorkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validace vstupů
+    if (!formData.name.trim()) {
+      setError('Zadej název tréninku');
+      return;
+    }
+    if (!formData.duration_minutes || parseInt(formData.duration_minutes) <= 0) {
+      setError('Zadej délku tréninku (musí být větší než 0)');
+      return;
+    }
+    if (parseInt(formData.duration_minutes) > 600) {
+      setError('Délka tréninku je příliš velká (max 600 minut)');
+      return;
+    }
+    if (formData.calories_burned && parseInt(formData.calories_burned) < 0) {
+      setError('Spálené kalorie nesmí být záporné číslo');
+      return;
+    }
+    if (!formData.workout_date) {
+      setError('Vyber datum tréninku');
+      return;
+    }
+
     setLoading(true);
 
     try {

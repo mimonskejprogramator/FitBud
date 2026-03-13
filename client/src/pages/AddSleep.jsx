@@ -46,6 +46,21 @@ function AddSleep() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validace vstupů před odesláním
+    if (!formData.sleep_date) {
+      setError('Vyber datum spánku');
+      return;
+    }
+    if (!formData.duration_hours || parseFloat(formData.duration_hours) <= 0) {
+      setError('Zadej délku spánku (musí být větší než 0)');
+      return;
+    }
+    if (parseFloat(formData.duration_hours) > 24) {
+      setError('Délka spánku nemůže být více než 24 hodin');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -53,11 +68,6 @@ function AddSleep() {
       if (!token) {
         navigate('/login');
         return;
-      }
-
-      // Validace
-      if (!formData.sleep_date || !formData.duration_hours) {
-        throw new Error('Vyplň datum a délku spánku');
       }
 
       const response = await fetch('http://localhost:3000/api/sleep', {

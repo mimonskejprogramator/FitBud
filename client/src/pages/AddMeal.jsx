@@ -28,6 +28,34 @@ function AddMeal() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validace - kontrola povinných polí
+    if (!formData.name.trim()) {
+      setError('Zadej název jídla');
+      return;
+    }
+    if (!formData.calories || parseInt(formData.calories) <= 0) {
+      setError('Zadej platný počet kalorií (musí být větší než 0)');
+      return;
+    }
+    if (!formData.meal_date) {
+      setError('Vyber datum');
+      return;
+    }
+    // Kontrola makroživin - nesmí být záporné
+    if (formData.protein && parseInt(formData.protein) < 0) {
+      setError('Bílkoviny nesmí být záporné číslo');
+      return;
+    }
+    if (formData.carbs && parseInt(formData.carbs) < 0) {
+      setError('Sacharidy nesmí být záporné číslo');
+      return;
+    }
+    if (formData.fats && parseInt(formData.fats) < 0) {
+      setError('Tuky nesmí být záporné číslo');
+      return;
+    }
+
     setLoading(true);
 
     try {
