@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { exportMeals } from '../utils/exportCSV';
 
 function Meals() {
   const navigate = useNavigate();
@@ -110,6 +111,21 @@ function Meals() {
               }}
             >
               + Přidat jídlo
+            </button>
+            <button
+              onClick={() => exportMeals(meals)}
+              disabled={meals.length === 0}
+              style={{
+                padding: '10px 20px',
+                background: meals.length === 0 ? '#ccc' : '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: meals.length === 0 ? 'not-allowed' : 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              📥 Export CSV
             </button>
             <button
               onClick={() => navigate('/dashboard')}

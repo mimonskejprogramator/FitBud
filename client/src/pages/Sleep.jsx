@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { exportSleep } from '../utils/exportCSV';
 
 function Sleep() {
   const navigate = useNavigate();
@@ -127,6 +128,21 @@ function Sleep() {
               }}
             >
               + Přidat záznam
+            </button>
+            <button
+              onClick={() => exportSleep(sleepRecords)}
+              disabled={sleepRecords.length === 0}
+              style={{
+                padding: '10px 20px',
+                background: sleepRecords.length === 0 ? '#ccc' : '#17a2b8',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: sleepRecords.length === 0 ? 'not-allowed' : 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              📥 Export CSV
             </button>
             <button
               onClick={() => navigate('/dashboard')}

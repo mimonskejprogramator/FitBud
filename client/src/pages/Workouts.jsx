@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { exportWorkouts } from '../utils/exportCSV';
 
 function Workouts() {
   const navigate = useNavigate();
@@ -119,6 +120,21 @@ function Workouts() {
               }}
             >
               + Přidat trénink
+            </button>
+            <button
+              onClick={() => exportWorkouts(workouts)}
+              disabled={workouts.length === 0}
+              style={{
+                padding: '10px 20px',
+                background: workouts.length === 0 ? '#ccc' : '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: workouts.length === 0 ? 'not-allowed' : 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              📥 Export CSV
             </button>
             <button
               onClick={() => navigate('/dashboard')}

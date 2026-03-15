@@ -12,6 +12,7 @@ import {
   Legend
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
+import { exportAllData } from '../utils/exportCSV';
 
 // Registrace komponent Chart.js - bez toho to nefunguje
 ChartJS.register(
@@ -32,6 +33,7 @@ function Stats() {
   const [sleepRecords, setSleepRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [exportMessage, setExportMessage] = useState('');
 
   useEffect(() => {
     loadAllData();
@@ -162,14 +164,46 @@ function Stats() {
     );
   }
 
+  const handleExportAll = async () => {
+    setExportMessage('');
+    const token = localStorage.getItem('token');
+    const result = await exportAllData(token);
+    setExportMessage(result.message);
+    setTimeout(() => setExportMessage(''), 5000);
+  };
+
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px' }}>
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <h1 style={{ marginBottom: '30px' }}>Statistiky a grafy</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <h1 style={{ margin: 0 }}>Statistiky a grafy</h1>
+          <button
+            onClick={handleExportAll}
+            disabled={meals.length === 0 && workouts.length === 0 && sleepRecords.length === 0}
+            style={{
+              padding: '12px 24px',
+              background: (meals.length === 0 && workouts.length === 0 && sleepRecords.length === 0) ? '#ccc' : '#28a745',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: (meals.length === 0 && workouts.length === 0 && sleepRecords.length === 0) ? 'not-allowed' : 'pointer',
+              fontWeight: 'bold',
+              fontSize: '14px'
+            }}
+          >
+            📥 Exportovat všechna data
+          </button>
+        </div>
 
         {error && (
           <div style={{ padding: '15px', marginBottom: '20px', background: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
             {error}
+          </div>
+        )}
+
+        {exportMessage && (
+          <div style={{ padding: '15px', marginBottom: '20px', background: '#d4edda', color: '#155724', borderRadius: '4px' }}>
+            {exportMessage}
           </div>
         )}
 
