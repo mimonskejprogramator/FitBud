@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { exportWorkouts } from '../utils/exportCSV';
+import Loading from '../components/Loading';
+import EmptyState from '../components/EmptyState';
 
 function Workouts() {
   const navigate = useNavigate();
@@ -89,11 +91,7 @@ function Workouts() {
   };
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px', textAlign: 'center' }}>
-        <p>Načítám...</p>
-      </div>
-    );
+    return <Loading message="Načítám tréninky..." />;
   }
 
   return (
@@ -166,29 +164,13 @@ function Workouts() {
         )}
 
         {workouts.length === 0 ? (
-          <div style={{
-            background: 'white',
-            padding: '40px',
-            borderRadius: '8px',
-            textAlign: 'center',
-            color: '#666'
-          }}>
-            <p>Zatím nemáš žádné tréninky.</p>
-            <button
-              onClick={() => navigate('/workouts/add')}
-              style={{
-                marginTop: '20px',
-                padding: '10px 20px',
-                background: '#dc3545',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Přidat první trénink
-            </button>
-          </div>
+          <EmptyState
+            icon="💪"
+            title="Zatím žádné tréninky"
+            message="Začni sledovat svou aktivitu přidáním prvního tréninku"
+            actionText="+ Přidat první trénink"
+            onAction={() => navigate('/workouts/add')}
+          />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             {workouts.map(workout => (

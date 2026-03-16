@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Loading from '../components/Loading';
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -85,11 +86,7 @@ function Dashboard() {
   };
 
   if (loading) {
-    return (
-      <div style={{ textAlign: 'center', marginTop: '50px' }}>
-        <p>Načítám...</p>
-      </div>
-    );
+    return <Loading message="Načítám dashboard..." />;
   }
 
   return (

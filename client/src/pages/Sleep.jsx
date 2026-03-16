@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { exportSleep } from '../utils/exportCSV';
+import Loading from '../components/Loading';
+import EmptyState from '../components/EmptyState';
 
 function Sleep() {
   const navigate = useNavigate();
@@ -97,11 +99,7 @@ function Sleep() {
   };
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px', textAlign: 'center' }}>
-        <p>Načítám...</p>
-      </div>
-    );
+    return <Loading message="Načítám záznamy spánku..." />;
   }
 
   return (
@@ -174,29 +172,13 @@ function Sleep() {
         )}
 
         {sleepRecords.length === 0 ? (
-          <div style={{
-            background: 'white',
-            padding: '40px',
-            borderRadius: '8px',
-            textAlign: 'center',
-            color: '#666'
-          }}>
-            <p>Zatím nemáš žádné záznamy o spánku.</p>
-            <button
-              onClick={() => navigate('/sleep/add')}
-              style={{
-                marginTop: '20px',
-                padding: '10px 20px',
-                background: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Přidat první záznam
-            </button>
-          </div>
+          <EmptyState
+            icon="😴"
+            title="Zatím žádné záznamy spánku"
+            message="Začni sledovat kvalitu svého spánku přidáním prvního záznamu"
+            actionText="+ Přidat první záznam"
+            onAction={() => navigate('/sleep/add')}
+          />
         ) : (
           <>
             {/* Statistiky */}

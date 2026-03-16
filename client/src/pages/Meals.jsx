@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { exportMeals } from '../utils/exportCSV';
+import Loading from '../components/Loading';
+import EmptyState from '../components/EmptyState';
 
 function Meals() {
   const navigate = useNavigate();
@@ -79,11 +81,7 @@ function Meals() {
   };
 
   if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px', textAlign: 'center' }}>
-        <p>Načítám...</p>
-      </div>
-    );
+    return <Loading message="Načítám jídla..." />;
   }
 
   return (
@@ -158,29 +156,13 @@ function Meals() {
 
         {/* Seznam jídel */}
         {meals.length === 0 ? (
-          <div style={{
-            background: 'white',
-            padding: '40px',
-            borderRadius: '8px',
-            textAlign: 'center',
-            color: '#666'
-          }}>
-            <p>Zatím nemáš žádná jídla zaznamenána.</p>
-            <button
-              onClick={() => navigate('/meals/add')}
-              style={{
-                marginTop: '15px',
-                padding: '10px 20px',
-                background: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Přidat první jídlo
-            </button>
-          </div>
+          <EmptyState
+            icon="🍽️"
+            title="Zatím žádná jídla"
+            message="Začni sledovat své stravování přidáním prvního jídla"
+            actionText="+ Přidat první jídlo"
+            onAction={() => navigate('/meals/add')}
+          />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             {meals.map(meal => (
