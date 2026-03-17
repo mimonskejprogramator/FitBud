@@ -44,6 +44,10 @@ export const downloadCSV = (csvContent, filename) => {
 
 // Export jídel
 export const exportMeals = (meals) => {
+  if (!meals || meals.length === 0) {
+    alert('Žádná data k exportu');
+    return;
+  }
   const headers = ['name', 'calories', 'protein', 'carbs', 'fats', 'meal_date', 'meal_time', 'notes'];
   const csvContent = convertToCSV(meals, headers);
   const filename = `fitbud_jidla_${new Date().toISOString().split('T')[0]}.csv`;
@@ -52,6 +56,10 @@ export const exportMeals = (meals) => {
 
 // Export tréninků
 export const exportWorkouts = (workouts) => {
+  if (!workouts || workouts.length === 0) {
+    alert('Žádná data k exportu');
+    return;
+  }
   const headers = ['name', 'workout_type', 'duration_minutes', 'calories_burned', 'workout_date', 'workout_time', 'notes'];
   const csvContent = convertToCSV(workouts, headers);
   const filename = `fitbud_treninky_${new Date().toISOString().split('T')[0]}.csv`;
@@ -60,6 +68,10 @@ export const exportWorkouts = (workouts) => {
 
 // Export spánku
 export const exportSleep = (sleepRecords) => {
+  if (!sleepRecords || sleepRecords.length === 0) {
+    alert('Žádná data k exportu');
+    return;
+  }
   const headers = ['sleep_date', 'bedtime', 'wake_time', 'duration_hours', 'quality', 'notes'];
   const csvContent = convertToCSV(sleepRecords, headers);
   const filename = `fitbud_spanek_${new Date().toISOString().split('T')[0]}.csv`;
