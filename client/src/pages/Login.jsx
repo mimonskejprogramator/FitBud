@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -43,87 +47,63 @@ function Login() {
   };
 
   return (
-    <div style={{
-      maxWidth: '400px',
-      margin: '50px auto',
-      padding: '20px',
-      fontFamily: 'system-ui, sans-serif'
-    }}>
-      <h1 style={{ textAlign: 'center', color: '#333' }}>FitBud</h1>
-      <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#666' }}>Přihlášení</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-3xl font-bold text-center">FitBud</CardTitle>
+          <CardDescription className="text-center text-base">
+            Přihlaste se do svého účtu
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="vas@email.cz"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '16px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Heslo</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Heslo</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '16px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
+            {error && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                {error}
+              </div>
+            )}
 
-        {error && (
-          <div style={{
-            padding: '10px',
-            marginBottom: '15px',
-            background: '#fee',
-            color: '#c33',
-            borderRadius: '4px',
-            fontSize: '14px'
-          }}>
-            {error}
-          </div>
-        )}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? 'Přihlašuji...' : 'Přihlásit se'}
+            </Button>
+          </form>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: '12px',
-            fontSize: '16px',
-            background: loading ? '#ccc' : '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          {loading ? 'Přihlašuji...' : 'Přihlásit se'}
-        </button>
-      </form>
-
-      <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px' }}>
-        Nemáš účet? <Link to="/register" style={{ color: '#007bff' }}>Zaregistruj se</Link>
-      </p>
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Nemáš účet?{' '}
+            <Link to="/register" className="text-primary hover:underline font-medium">
+              Zaregistruj se
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

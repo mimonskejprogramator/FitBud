@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 function Register() {
   const [name, setName] = useState('');
@@ -43,107 +47,79 @@ function Register() {
   };
 
   return (
-    <div style={{
-      maxWidth: '400px',
-      margin: '50px auto',
-      padding: '20px',
-      fontFamily: 'system-ui, sans-serif'
-    }}>
-      <h1 style={{ textAlign: 'center', color: '#333' }}>FitBud</h1>
-      <h2 style={{ textAlign: 'center', marginBottom: '30px', color: '#666' }}>Registrace</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-3xl font-bold text-center">FitBud</CardTitle>
+          <CardDescription className="text-center text-base">
+            Vytvořte si nový účet
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Jméno</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Jan Novák"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Jméno</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '16px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="vas@email.cz"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '16px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Heslo</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Minimálně 6 znaků"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+              />
+              <p className="text-xs text-muted-foreground">
+                Heslo musí mít alespoň 6 znaků
+              </p>
+            </div>
 
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Heslo (min. 6 znaků)</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            placeholder="Minimálně 6 znaků"
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '16px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              boxSizing: 'border-box'
-            }}
-          />
-        </div>
+            {error && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                {error}
+              </div>
+            )}
 
-        {error && (
-          <div style={{
-            padding: '10px',
-            marginBottom: '15px',
-            background: '#fee',
-            color: '#c33',
-            borderRadius: '4px',
-            fontSize: '14px'
-          }}>
-            {error}
-          </div>
-        )}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? 'Registruji...' : 'Zaregistrovat se'}
+            </Button>
+          </form>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: '12px',
-            fontSize: '16px',
-            background: loading ? '#ccc' : '#28a745',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          {loading ? 'Registruji...' : 'Zaregistrovat se'}
-        </button>
-      </form>
-
-      <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px' }}>
-        Už máš účet? <Link to="/login" style={{ color: '#007bff' }}>Přihlas se</Link>
-      </p>
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            Už máš účet?{' '}
+            <Link to="/login" className="text-primary hover:underline font-medium">
+              Přihlas se
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
