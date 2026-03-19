@@ -56,20 +56,26 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { sleep_date, bedtime, wake_time, duration_hours, quality, notes } = req.body;
-    
+
+    console.log('📥 Přijatá data:', { sleep_date, bedtime, wake_time, duration_hours, quality, notes });
+    console.log('👤 User ID:', req.user.id);
+
     // Validace
     if (!sleep_date || !duration_hours) {
-      return res.status(400).json({ 
-        error: 'Datum a délka spánku jsou povinné' 
+      console.log('❌ Validace selhala - chybí datum nebo délka');
+      return res.status(400).json({
+        error: 'Datum a délka spánku jsou povinné'
       });
     }
-    
+
     const db = getDatabase();
+    console.log('💾 Ukládám do databáze...');
     const result = await db.run(
       `INSERT INTO sleep (user_id, sleep_date, bedtime, wake_time, duration_hours, quality, notes)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [req.user.id, sleep_date, bedtime, wake_time, duration_hours, quality, notes]
     );
+    console.log('✅ Uloženo s ID:', result.lastID);
     
     res.status(201).json({
       message: 'Záznam spánku přidán',
@@ -85,8 +91,13 @@ router.post('/', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Chyba při vytváření záznamu spánku:', error);
-    res.status(500).json({ error: 'Nepodařilo se vytvořit záznam spánku' });
+    console.error('❌ CHYBA při vytváření záznamu spánku:', error);
+    console.error('❌ Error message:', error.message);
+    console.error('❌ Error stack:', error.stack);
+    res.status(500).json({
+      error: 'Nepodařilo se vytvořit záznam spánku',
+      details: error.message
+    });
   }
 });
 

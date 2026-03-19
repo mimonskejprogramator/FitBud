@@ -197,9 +197,11 @@ function Workouts() {
                           color: 'white',
                           padding: '2px 8px',
                           borderRadius: '4px',
-                          fontSize: '12px'
+                          fontSize: '12px',
+                          display: 'inline-block',
+                          minWidth: '60px'
                         }}>
-                          {getWorkoutTypeLabel(workout.workout_type)}
+                          {getWorkoutTypeLabel(workout.workout_type) || 'Neuvedeno'}
                         </span>
                       </div>
                       <div>

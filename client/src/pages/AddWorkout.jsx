@@ -8,7 +8,7 @@ function AddWorkout() {
 
   const [formData, setFormData] = useState({
     name: '',
-    type: 'cardio',
+    workout_type: 'cardio',
     duration_minutes: '',
     calories_burned: '',
     workout_date: new Date().toISOString().split('T')[0],
@@ -156,8 +156,8 @@ function AddWorkout() {
               Typ tréninku *
             </label>
             <select
-              name="type"
-              value={formData.type}
+              name="workout_type"
+              value={formData.workout_type}
               onChange={handleChange}
               required
               style={{

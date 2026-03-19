@@ -55,29 +55,29 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const { name, type, duration_minutes, calories_burned, workout_date, workout_time, notes } = req.body;
-    
+    const { name, workout_type, duration_minutes, calories_burned, workout_date, workout_time, notes } = req.body;
+
     // Validace
     if (!name || !duration_minutes || !workout_date) {
-      return res.status(400).json({ 
-        error: 'Název, délka a datum jsou povinné' 
+      return res.status(400).json({
+        error: 'Název, délka a datum jsou povinné'
       });
     }
-    
+
     const db = getDatabase();
     const result = await db.run(
-      `INSERT INTO workouts (user_id, name, type, duration_minutes, calories_burned, workout_date, workout_time, notes)
+      `INSERT INTO workouts (user_id, name, workout_type, duration_minutes, calories_burned, workout_date, workout_time, notes)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [req.user.id, name, type, duration_minutes, calories_burned || 0, workout_date, workout_time, notes]
+      [req.user.id, name, workout_type, duration_minutes, calories_burned || 0, workout_date, workout_time, notes]
     );
-    
+
     res.status(201).json({
       message: 'Trénink přidán',
       workout: {
         id: result.lastID,
         user_id: req.user.id,
         name,
-        type,
+        workout_type,
         duration_minutes,
         calories_burned: calories_burned || 0,
         workout_date,
@@ -97,28 +97,28 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { name, type, duration_minutes, calories_burned, workout_date, workout_time, notes } = req.body;
-    
+    const { name, workout_type, duration_minutes, calories_burned, workout_date, workout_time, notes } = req.body;
+
     const db = getDatabase();
-    
+
     // Kontrola, že trénink patří uživateli
     const existing = await db.get(
       'SELECT id FROM workouts WHERE id = ? AND user_id = ?',
       [req.params.id, req.user.id]
     );
-    
+
     if (!existing) {
       return res.status(404).json({ error: 'Trénink nenalezen' });
     }
-    
+
     await db.run(
-      `UPDATE workouts 
-       SET name = ?, type = ?, duration_minutes = ?, calories_burned = ?, 
+      `UPDATE workouts
+       SET name = ?, workout_type = ?, duration_minutes = ?, calories_burned = ?,
            workout_date = ?, workout_time = ?, notes = ?
        WHERE id = ? AND user_id = ?`,
-      [name, type, duration_minutes, calories_burned, workout_date, workout_time, notes, req.params.id, req.user.id]
+      [name, workout_type, duration_minutes, calories_burned, workout_date, workout_time, notes, req.params.id, req.user.id]
     );
-    
+
     res.json({ message: 'Trénink aktualizován' });
   } catch (error) {
     console.error('Chyba při aktualizaci tréninku:', error);

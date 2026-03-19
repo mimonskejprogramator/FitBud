@@ -79,13 +79,20 @@ function EditSleep() {
 
     try {
       const token = localStorage.getItem('token');
+
+      // Převod duration_hours na číslo
+      const dataToSend = {
+        ...formData,
+        duration_hours: parseFloat(formData.duration_hours)
+      };
+
       const response = await fetch(`http://localhost:3000/api/sleep/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(dataToSend)
       });
 
       const data = await response.json();
