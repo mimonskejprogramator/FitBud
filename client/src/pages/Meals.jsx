@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { exportMeals } from '../utils/exportCSV';
 import Loading from '../components/Loading';
 import EmptyState from '../components/EmptyState';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Utensils, Plus, Download, Pencil, Trash2 } from 'lucide-react';
 
 function Meals() {
   const navigate = useNavigate();
@@ -51,10 +56,6 @@ function Meals() {
 
   // Funkce pro smazání jídla
   const handleDelete = async (id) => {
-    if (!confirm('Opravdu chceš smazat toto jídlo?')) {
-      return;
-    }
-
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3000/api/meals/${id}`, {
@@ -85,73 +86,42 @@ function Meals() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px' }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-4 md:p-6 space-y-6">
         {/* Header */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '20px'
-        }}>
-          <h1 style={{ margin: 0 }}>Moje jídla</h1>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={() => navigate('/meals/add')}
-              style={{
-                padding: '10px 20px',
-                background: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              + Přidat jídlo
-            </button>
-            <button
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+              <Utensils className="h-8 w-8" />
+              Moje jídla
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Celkem {meals.length} záznamů
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={() => navigate('/meals/add')} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Přidat jídlo
+            </Button>
+            <Button
               onClick={() => exportMeals(meals)}
               disabled={meals.length === 0}
-              style={{
-                padding: '10px 20px',
-                background: meals.length === 0 ? '#ccc' : '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: meals.length === 0 ? 'not-allowed' : 'pointer',
-                fontWeight: 'bold'
-              }}
+              variant="outline"
+              className="gap-2"
             >
-              📥 Export CSV
-            </button>
-            <button
-              onClick={() => navigate('/dashboard')}
-              style={{
-                padding: '10px 20px',
-                background: '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Dashboard
-            </button>
+              <Download className="h-4 w-4" />
+              Export CSV
+            </Button>
           </div>
         </div>
 
         {error && (
-          <div style={{
-            padding: '15px',
-            marginBottom: '20px',
-            background: '#f8d7da',
-            color: '#721c24',
-            border: '1px solid #f5c6cb',
-            borderRadius: '4px'
-          }}>
-            {error}
-          </div>
+          <Card className="border-destructive">
+            <CardContent className="pt-6">
+              <p className="text-destructive">{error}</p>
+            </CardContent>
+          </Card>
         )}
 
         {/* Seznam jídel */}
@@ -164,87 +134,88 @@ function Meals() {
             onAction={() => navigate('/meals/add')}
           />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {meals.map(meal => (
-              <div key={meal.id} style={{
-                background: 'white',
-                padding: '20px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                border: '1px solid #ddd'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <div style={{ flex: 1 }}>
-                    <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{meal.name}</h3>
-                    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '10px' }}>
+          <ScrollArea className="h-[calc(100vh-250px)]">
+            <div className="space-y-4">
+              {meals.map(meal => (
+                <Card key={meal.id}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <CardTitle className="text-xl">{meal.name}</CardTitle>
+                        <CardDescription className="mt-2">
+                          {formatDate(meal.meal_date)} {meal.meal_time && `• ${meal.meal_time}`}
+                        </CardDescription>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => navigate(`/meals/edit/${meal.id}`)}
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Upravit
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm" className="gap-2">
+                              <Trash2 className="h-4 w-4" />
+                              Smazat
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Opravdu chceš smazat toto jídlo?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tato akce je nevratná. Jídlo "{meal.name}" bude trvale odstraněno.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Zrušit</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(meal.id)}>
+                                Smazat
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
-                        <span style={{ color: '#666', fontSize: '14px' }}>Kalorie: </span>
-                        <strong style={{ color: '#28a745', fontSize: '18px' }}>{meal.calories} kcal</strong>
+                        <p className="text-sm text-muted-foreground">Kalorie</p>
+                        <p className="text-2xl font-bold text-primary">{meal.calories} kcal</p>
                       </div>
                       {meal.protein > 0 && (
                         <div>
-                          <span style={{ color: '#666', fontSize: '14px' }}>Bílkoviny: </span>
-                          <strong>{meal.protein}g</strong>
+                          <p className="text-sm text-muted-foreground">Bílkoviny</p>
+                          <p className="text-lg font-semibold">{meal.protein}g</p>
                         </div>
                       )}
                       {meal.carbs > 0 && (
                         <div>
-                          <span style={{ color: '#666', fontSize: '14px' }}>Sacharidy: </span>
-                          <strong>{meal.carbs}g</strong>
+                          <p className="text-sm text-muted-foreground">Sacharidy</p>
+                          <p className="text-lg font-semibold">{meal.carbs}g</p>
                         </div>
                       )}
                       {meal.fats > 0 && (
                         <div>
-                          <span style={{ color: '#666', fontSize: '14px' }}>Tuky: </span>
-                          <strong>{meal.fats}g</strong>
+                          <p className="text-sm text-muted-foreground">Tuky</p>
+                          <p className="text-lg font-semibold">{meal.fats}g</p>
                         </div>
                       )}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#999' }}>
-                      {formatDate(meal.meal_date)} {meal.meal_time && `• ${meal.meal_time}`}
-                    </div>
                     {meal.notes && (
-                      <p style={{ margin: '10px 0 0 0', color: '#666', fontSize: '14px' }}>
+                      <p className="mt-4 text-sm text-muted-foreground border-t pt-4">
                         {meal.notes}
                       </p>
                     )}
-                  </div>
-
-                  {/* Tlačítka pro akce */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginLeft: '15px' }}>
-                    <button
-                      onClick={() => navigate(`/meals/edit/${meal.id}`)}
-                      style={{
-                        padding: '6px 12px',
-                        background: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
-                      }}
-                    >
-                      Upravit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(meal.id)}
-                      style={{
-                        padding: '6px 12px',
-                        background: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
-                      }}
-                    >
-                      Smazat
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
         )}
       </div>
     </div>

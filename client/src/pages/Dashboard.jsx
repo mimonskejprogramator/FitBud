@@ -13,6 +13,9 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 ChartJS.register(
   CategoryScale,
@@ -196,324 +199,148 @@ function Dashboard() {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#f8fafc',
-      padding: '0'
-    }}>
-      {/* Top Bar */}
-      <div style={{
-        background: 'white',
-        borderBottom: '1px solid #e2e8f0',
-        padding: '16px 24px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10
-      }}>
-        <div>
-          <h1 style={{
-            margin: 0,
-            fontSize: '24px',
-            fontWeight: '600',
-            color: '#1e293b'
-          }}>
-            Dashboard
-          </h1>
-          <p style={{
-            margin: '4px 0 0 0',
-            fontSize: '14px',
-            color: '#64748b'
-          }}>
-            Vítej zpět, {user?.name || user?.email}
-          </p>
-        </div>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: '8px 16px',
-            background: 'white',
-            color: '#64748b',
-            border: '1px solid #e2e8f0',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '500',
-            transition: 'all 0.2s'
-          }}
-          onMouseOver={(e) => {
-            e.target.style.background = '#f8fafc';
-            e.target.style.borderColor = '#cbd5e1';
-          }}
-          onMouseOut={(e) => {
-            e.target.style.background = 'white';
-            e.target.style.borderColor = '#e2e8f0';
-          }}
-        >
-          Odhlásit se
-        </button>
-      </div>
-
+    <div className="min-h-screen bg-background">
       {/* Hlavní obsah */}
-      <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '24px'
-      }}>
+      <div className="max-w-7xl mx-auto p-6">
         {/* Statistiky - 3 karty */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px'
-        }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {/* Karta - Jídla */}
-          <div style={{
-            padding: '24px',
-            background: 'white',
-            border: '1px solid #e2e8f0',
-            borderRadius: '12px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-          }}>
-            <div style={{
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#64748b',
-              marginBottom: '8px'
-            }}>
-              Příjem kalorií
-            </div>
-            <div style={{
-              fontSize: '36px',
-              fontWeight: '700',
-              color: '#0f172a',
-              marginBottom: '4px'
-            }}>
-              {stats.totalCaloriesIn}
-            </div>
-            <div style={{
-              fontSize: '13px',
-              color: '#94a3b8'
-            }}>
-              {stats.todayMeals.length} jídel dnes
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Příjem kalorií</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <div className="text-4xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors">
+                    {stats.totalCaloriesIn}
+                  </div>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">Dnešní jídla</h4>
+                    {stats.todayMeals.length > 0 ? (
+                      <div className="space-y-1">
+                        {stats.todayMeals.map((meal, idx) => (
+                          <div key={idx} className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">{meal.name}</span>
+                            <span className="font-medium">{meal.calories} kcal</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Zatím žádná jídla</p>
+                    )}
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stats.todayMeals.length} jídel dnes
+              </p>
+            </CardContent>
+          </Card>
 
           {/* Karta - Tréninky */}
-          <div style={{
-            padding: '24px',
-            background: 'white',
-            border: '1px solid #e2e8f0',
-            borderRadius: '12px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-          }}>
-            <div style={{
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#64748b',
-              marginBottom: '8px'
-            }}>
-              Spálené kalorie
-            </div>
-            <div style={{
-              fontSize: '36px',
-              fontWeight: '700',
-              color: '#0f172a',
-              marginBottom: '4px'
-            }}>
-              {stats.totalCaloriesOut}
-            </div>
-            <div style={{
-              fontSize: '13px',
-              color: '#94a3b8'
-            }}>
-              {stats.todayWorkouts.length} tréninků dnes
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Spálené kalorie</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-foreground">
+                {stats.totalCaloriesOut}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stats.todayWorkouts.length} tréninků dnes
+              </p>
+            </CardContent>
+          </Card>
 
           {/* Karta - Spánek */}
-          <div style={{
-            padding: '24px',
-            background: 'white',
-            border: '1px solid #e2e8f0',
-            borderRadius: '12px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-          }}>
-            <div style={{
-              fontSize: '14px',
-              fontWeight: '500',
-              color: '#64748b',
-              marginBottom: '8px'
-            }}>
-              Spánek
-            </div>
-            {stats.todaySleep ? (
-              <>
-                <div style={{
-                  fontSize: '36px',
-                  fontWeight: '700',
-                  color: '#0f172a',
-                  marginBottom: '4px'
-                }}>
-                  {stats.todaySleep.duration_hours}h
-                </div>
-                <div style={{
-                  fontSize: '13px',
-                  color: '#94a3b8'
-                }}>
-                  Kvalita: {stats.todaySleep.quality}
-                </div>
-              </>
-            ) : (
-              <>
-                <div style={{
-                  fontSize: '36px',
-                  fontWeight: '700',
-                  color: '#cbd5e1',
-                  marginBottom: '4px'
-                }}>
-                  -
-                </div>
-                <div style={{
-                  fontSize: '13px',
-                  color: '#94a3b8'
-                }}>
-                  Zatím nezaznamenáno
-                </div>
-              </>
-            )}
-          </div>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Spánek</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {stats.todaySleep ? (
+                <>
+                  <div className="text-4xl font-bold text-foreground">
+                    {stats.todaySleep.duration_hours}h
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Kvalita: {stats.todaySleep.quality}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-4xl font-bold text-muted">
+                    -
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Zatím nezaznamenáno
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Grafy */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-          gap: '16px',
-          marginBottom: '24px'
-        }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           {/* Graf kalorií */}
-          <div style={{
-            padding: '24px',
-            background: 'white',
-            border: '1px solid #e2e8f0',
-            borderRadius: '12px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-          }}>
-            <h3 style={{
-              margin: '0 0 20px 0',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#0f172a'
-            }}>
-              Kalorický příjem (7 dní)
-            </h3>
-            <div style={{ height: '250px' }}>
-              <Bar data={caloriesChartData} options={chartOptions} />
-            </div>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Kalorický příjem (7 dní)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                <Bar data={caloriesChartData} options={chartOptions} />
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Graf spánku */}
-          <div style={{
-            padding: '24px',
-            background: 'white',
-            border: '1px solid #e2e8f0',
-            borderRadius: '12px',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-          }}>
-            <h3 style={{
-              margin: '0 0 20px 0',
-              fontSize: '16px',
-              fontWeight: '600',
-              color: '#0f172a'
-            }}>
-              Délka spánku (7 dní)
-            </h3>
-            <div style={{ height: '250px' }}>
-              <Line data={sleepChartData} options={chartOptions} />
-            </div>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Délka spánku (7 dní)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
+                <Line data={sleepChartData} options={chartOptions} />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Rychlé akce */}
-        <div style={{
-          padding: '24px',
-          background: 'white',
-          border: '1px solid #e2e8f0',
-          borderRadius: '12px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-        }}>
-          <h3 style={{
-            margin: '0 0 16px 0',
-            fontSize: '16px',
-            fontWeight: '600',
-            color: '#0f172a'
-          }}>
-            Rychlé akce
-          </h3>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '12px'
-          }}>
-            <button
-              onClick={() => navigate('/meals/add')}
-              style={{
-                padding: '12px 20px',
-                background: '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s'
-              }}
-              onMouseOver={(e) => e.target.style.background = '#2563eb'}
-              onMouseOut={(e) => e.target.style.background = '#3b82f6'}
-            >
-              Přidat jídlo
-            </button>
-            <button
-              onClick={() => navigate('/workouts/add')}
-              style={{
-                padding: '12px 20px',
-                background: '#8b5cf6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s'
-              }}
-              onMouseOver={(e) => e.target.style.background = '#7c3aed'}
-              onMouseOut={(e) => e.target.style.background = '#8b5cf6'}
-            >
-              Přidat trénink
-            </button>
-            <button
-              onClick={() => navigate('/sleep/add')}
-              style={{
-                padding: '12px 20px',
-                background: '#06b6d4',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s'
-              }}
-              onMouseOver={(e) => e.target.style.background = '#0891b2'}
-              onMouseOut={(e) => e.target.style.background = '#06b6d4'}
-            >
-              Přidat spánek
-            </button>
-          </div>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Rychlé akce</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Button
+                onClick={() => navigate('/meals/add')}
+                className="w-full"
+              >
+                Přidat jídlo
+              </Button>
+              <Button
+                onClick={() => navigate('/workouts/add')}
+                className="w-full"
+                variant="secondary"
+              >
+                Přidat trénink
+              </Button>
+              <Button
+                onClick={() => navigate('/sleep/add')}
+                className="w-full"
+                variant="outline"
+              >
+                Přidat spánek
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

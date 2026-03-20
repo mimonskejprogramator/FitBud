@@ -24,7 +24,8 @@ import AddSleep from './pages/AddSleep';
 import EditSleep from './pages/EditSleep';
 
 // Komponenty
-import Navbar from './components/Navbar';
+import Layout from './components/Layout';
+import { Toaster } from "@/components/ui/toaster";
 
 /**
  * Hlavní komponenta aplikace FitBud
@@ -33,10 +34,8 @@ import Navbar from './components/Navbar';
 function App() {
   return (
     <BrowserRouter>
-      {/* Navbar se zobrazí na všech stránkách kromě login/register */}
-      <Navbar />
-
-      <Routes>
+      <Layout>
+        <Routes>
         {/* Autentizace */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -62,7 +61,9 @@ function App() {
 
         {/* Výchozí přesměrování na login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
-      </Routes>
+        </Routes>
+      </Layout>
+      <Toaster />
     </BrowserRouter>
   );
 }

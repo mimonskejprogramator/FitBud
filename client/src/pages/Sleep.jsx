@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { exportSleep } from '../utils/exportCSV';
 import Loading from '../components/Loading';
 import EmptyState from '../components/EmptyState';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Moon, Plus, Download, Pencil, Trash2, Clock } from 'lucide-react';
 
 function Sleep() {
   const navigate = useNavigate();
@@ -48,10 +53,6 @@ function Sleep() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Opravdu chceš smazat tento záznam?')) {
-      return;
-    }
-
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3000/api/sleep/${id}`, {
@@ -103,72 +104,42 @@ function Sleep() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px' }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '20px'
-        }}>
-          <h1 style={{ margin: 0 }}>Můj spánek</h1>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={() => navigate('/sleep/add')}
-              style={{
-                padding: '10px 20px',
-                background: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              + Přidat záznam
-            </button>
-            <button
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-4 md:p-6 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+              <Moon className="h-8 w-8" />
+              Můj spánek
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Celkem {sleepRecords.length} záznamů
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={() => navigate('/sleep/add')} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Přidat záznam
+            </Button>
+            <Button
               onClick={() => exportSleep(sleepRecords)}
               disabled={sleepRecords.length === 0}
-              style={{
-                padding: '10px 20px',
-                background: sleepRecords.length === 0 ? '#ccc' : '#17a2b8',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: sleepRecords.length === 0 ? 'not-allowed' : 'pointer',
-                fontWeight: 'bold'
-              }}
+              variant="outline"
+              className="gap-2"
             >
-              📥 Export CSV
-            </button>
-            <button
-              onClick={() => navigate('/dashboard')}
-              style={{
-                padding: '10px 20px',
-                background: '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Dashboard
-            </button>
+              <Download className="h-4 w-4" />
+              Export CSV
+            </Button>
           </div>
         </div>
 
         {error && (
-          <div style={{
-            padding: '15px',
-            marginBottom: '20px',
-            background: '#f8d7da',
-            color: '#721c24',
-            border: '1px solid #f5c6cb',
-            borderRadius: '4px'
-          }}>
-            {error}
-          </div>
+          <Card className="border-destructive">
+            <CardContent className="pt-6">
+              <p className="text-destructive">{error}</p>
+            </CardContent>
+          </Card>
         )}
 
         {sleepRecords.length === 0 ? (
@@ -182,121 +153,105 @@ function Sleep() {
         ) : (
           <>
             {/* Statistiky */}
-            <div style={{
-              background: 'white',
-              padding: '20px',
-              borderRadius: '8px',
-              marginBottom: '20px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}>
-              <h3 style={{ marginTop: 0 }}>Statistiky za posledních 7 dní</h3>
-              <div style={{ display: 'flex', gap: '30px', flexWrap: 'wrap' }}>
-                <div>
-                  <span style={{ color: '#666', fontSize: '14px' }}>Průměrná délka: </span>
-                  <strong style={{ fontSize: '18px', color: '#007bff' }}>
-                    {(sleepRecords.slice(0, 7).reduce((sum, r) => sum + parseFloat(r.duration_hours), 0) / Math.min(7, sleepRecords.length)).toFixed(1)}h
-                  </strong>
-                </div>
-                <div>
-                  <span style={{ color: '#666', fontSize: '14px' }}>Počet záznamů: </span>
-                  <strong style={{ fontSize: '18px' }}>{sleepRecords.length}</strong>
-                </div>
-              </div>
-            </div>
-
-            {/* Seznam záznamů */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              {sleepRecords.map(record => (
-                <div
-                  key={record.id}
-                  style={{
-                    background: 'white',
-                    padding: '20px',
-                    borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    border: '1px solid #ddd'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '14px', color: '#999', marginBottom: '10px' }}>
-                        {formatDate(record.sleep_date)}
-                      </div>
-                      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '10px' }}>
-                        <div>
-                          <span style={{ color: '#666', fontSize: '14px' }}>Délka: </span>
-                          <strong style={{ fontSize: '24px', color: '#007bff' }}>
-                            {record.duration_hours}h
-                          </strong>
-                        </div>
-                        <div>
-                          <span style={{ color: '#666', fontSize: '14px' }}>Kvalita: </span>
-                          <span style={{
-                            background: getQualityColor(record.quality),
-                            color: 'white',
-                            padding: '4px 12px',
-                            borderRadius: '4px',
-                            fontSize: '14px',
-                            fontWeight: 'bold'
-                          }}>
-                            {getQualityLabel(record.quality)}
-                          </span>
-                        </div>
-                      </div>
-                      {(record.bedtime || record.wake_time) && (
-                        <div style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
-                          {record.bedtime && `Usnutí: ${record.bedtime}`}
-                          {record.bedtime && record.wake_time && ' • '}
-                          {record.wake_time && `Probuzení: ${record.wake_time}`}
-                        </div>
-                      )}
-                      {record.notes && (
-                        <div style={{
-                          marginTop: '10px',
-                          padding: '10px',
-                          background: '#f8f9fa',
-                          borderRadius: '4px',
-                          fontSize: '14px',
-                          color: '#666'
-                        }}>
-                          {record.notes}
-                        </div>
-                      )}
-                    </div>
-                    <div style={{ display: 'flex', gap: '10px', marginLeft: '20px' }}>
-                      <button
-                        onClick={() => navigate(`/sleep/edit/${record.id}`)}
-                        style={{
-                          padding: '8px 16px',
-                          background: '#007bff',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '14px'
-                        }}
-                      >
-                        Upravit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(record.id)}
-                        style={{
-                          padding: '8px 16px',
-                          background: '#dc3545',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '14px'
-                        }}
-                      >
-                        Smazat
-                      </button>
-                    </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Statistiky za posledních 7 dní</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Průměrná délka</p>
+                    <p className="text-3xl font-bold text-primary">
+                      {(sleepRecords.slice(0, 7).reduce((sum, r) => sum + parseFloat(r.duration_hours), 0) / Math.min(7, sleepRecords.length)).toFixed(1)}h
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Počet záznamů</p>
+                    <p className="text-3xl font-bold">{sleepRecords.length}</p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Seznam záznamů */}
+            <ScrollArea className="h-[calc(100vh-400px)]">
+              <div className="space-y-4">
+              {sleepRecords.map(record => (
+                <Card key={record.id}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <CardTitle className="text-xl">Spánek</CardTitle>
+                        <CardDescription className="mt-2">
+                          {formatDate(record.sleep_date)}
+                        </CardDescription>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => navigate(`/sleep/edit/${record.id}`)}
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Upravit
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm" className="gap-2">
+                              <Trash2 className="h-4 w-4" />
+                              Smazat
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Opravdu chceš smazat tento záznam?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tato akce je nevratná. Záznam spánku bude trvale odstraněn.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Zrušit</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(record.id)}>
+                                Smazat
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          Délka
+                        </p>
+                        <p className="text-3xl font-bold text-primary">{record.duration_hours}h</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Kvalita</p>
+                        <p className="text-lg font-semibold">{getQualityLabel(record.quality)}</p>
+                      </div>
+                    </div>
+                    {(record.bedtime || record.wake_time) && (
+                      <div className="mt-4 text-sm text-muted-foreground">
+                        {record.bedtime && `Usnutí: ${record.bedtime}`}
+                        {record.bedtime && record.wake_time && ' • '}
+                        {record.wake_time && `Probuzení: ${record.wake_time}`}
+                      </div>
+                    )}
+                    {record.notes && (
+                      <p className="mt-4 text-sm text-muted-foreground border-t pt-4">
+                        {record.notes}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
               ))}
-            </div>
+              </div>
+            </ScrollArea>
           </>
         )}
       </div>

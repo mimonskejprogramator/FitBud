@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { exportWorkouts } from '../utils/exportCSV';
 import Loading from '../components/Loading';
 import EmptyState from '../components/EmptyState';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dumbbell, Plus, Download, Pencil, Trash2, Clock, Flame } from 'lucide-react';
 
 function Workouts() {
   const navigate = useNavigate();
@@ -50,10 +55,6 @@ function Workouts() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Opravdu chceš smazat tento trénink?')) {
-      return;
-    }
-
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`http://localhost:3000/api/workouts/${id}`, {
@@ -95,74 +96,45 @@ function Workouts() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px' }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '20px'
-        }}>
-          <h1 style={{ margin: 0 }}>Moje tréninky</h1>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={() => navigate('/workouts/add')}
-              style={{
-                padding: '10px 20px',
-                background: '#dc3545',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              + Přidat trénink
-            </button>
-            <button
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-4 md:p-6 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+              <Dumbbell className="h-8 w-8" />
+              Moje tréninky
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Celkem {workouts.length} záznamů
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={() => navigate('/workouts/add')} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Přidat trénink
+            </Button>
+            <Button
               onClick={() => exportWorkouts(workouts)}
               disabled={workouts.length === 0}
-              style={{
-                padding: '10px 20px',
-                background: workouts.length === 0 ? '#ccc' : '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: workouts.length === 0 ? 'not-allowed' : 'pointer',
-                fontWeight: 'bold'
-              }}
+              variant="outline"
+              className="gap-2"
             >
-              📥 Export CSV
-            </button>
-            <button
-              onClick={() => navigate('/dashboard')}
-              style={{
-                padding: '10px 20px',
-                background: '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Dashboard
-            </button>
+              <Download className="h-4 w-4" />
+              Export CSV
+            </Button>
           </div>
         </div>
 
         {error && (
-          <div style={{
-            padding: '15px',
-            marginBottom: '20px',
-            background: '#f8d7da',
-            color: '#721c24',
-            border: '1px solid #f5c6cb',
-            borderRadius: '4px'
-          }}>
-            {error}
-          </div>
+          <Card className="border-destructive">
+            <CardContent className="pt-6">
+              <p className="text-destructive">{error}</p>
+            </CardContent>
+          </Card>
         )}
 
+        {/* Seznam tréninků */}
         {workouts.length === 0 ? (
           <EmptyState
             icon="💪"
@@ -172,100 +144,86 @@ function Workouts() {
             onAction={() => navigate('/workouts/add')}
           />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {workouts.map(workout => (
-              <div
-                key={workout.id}
-                style={{
-                  background: 'white',
-                  padding: '20px',
-                  borderRadius: '8px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  border: '1px solid #ddd'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <div style={{ flex: 1 }}>
-                    <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>
-                      {workout.name}
-                    </h3>
-                    <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '10px' }}>
+          <ScrollArea className="h-[calc(100vh-250px)]">
+            <div className="space-y-4">
+              {workouts.map(workout => (
+                <Card key={workout.id}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <CardTitle className="text-xl">{workout.name}</CardTitle>
+                        <CardDescription className="mt-2">
+                          {formatDate(workout.workout_date)} {workout.workout_time && `• ${workout.workout_time}`}
+                        </CardDescription>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => navigate(`/workouts/edit/${workout.id}`)}
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                        >
+                          <Pencil className="h-4 w-4" />
+                          Upravit
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm" className="gap-2">
+                              <Trash2 className="h-4 w-4" />
+                              Smazat
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Opravdu chceš smazat tento trénink?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Tato akce je nevratná. Trénink "{workout.name}" bude trvale odstraněn.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Zrušit</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDelete(workout.id)}>
+                                Smazat
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div>
-                        <span style={{ color: '#666', fontSize: '14px' }}>Typ: </span>
-                        <span style={{
-                          background: '#dc3545',
-                          color: 'white',
-                          padding: '2px 8px',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          display: 'inline-block',
-                          minWidth: '60px'
-                        }}>
-                          {getWorkoutTypeLabel(workout.workout_type) || 'Neuvedeno'}
-                        </span>
+                        <p className="text-sm text-muted-foreground">Typ</p>
+                        <p className="text-lg font-semibold">{getWorkoutTypeLabel(workout.workout_type) || 'Neuvedeno'}</p>
                       </div>
                       <div>
-                        <span style={{ color: '#666', fontSize: '14px' }}>Délka: </span>
-                        <strong>{workout.duration_minutes} min</strong>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          Délka
+                        </p>
+                        <p className="text-lg font-semibold">{workout.duration_minutes} min</p>
                       </div>
                       {workout.calories_burned && (
                         <div>
-                          <span style={{ color: '#666', fontSize: '14px' }}>Spáleno: </span>
-                          <strong style={{ color: '#dc3545' }}>{workout.calories_burned} kcal</strong>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            <Flame className="h-4 w-4" />
+                            Spáleno
+                          </p>
+                          <p className="text-2xl font-bold text-destructive">{workout.calories_burned} kcal</p>
                         </div>
                       )}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#999' }}>
-                      {formatDate(workout.workout_date)}
-                      {workout.workout_time && ` • ${workout.workout_time}`}
-                    </div>
                     {workout.notes && (
-                      <div style={{
-                        marginTop: '10px',
-                        padding: '10px',
-                        background: '#f8f9fa',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        color: '#666'
-                      }}>
+                      <p className="mt-4 text-sm text-muted-foreground border-t pt-4">
                         {workout.notes}
-                      </div>
+                      </p>
                     )}
-                  </div>
-                  <div style={{ display: 'flex', gap: '10px', marginLeft: '20px' }}>
-                    <button
-                      onClick={() => navigate(`/workouts/edit/${workout.id}`)}
-                      style={{
-                        padding: '8px 16px',
-                        background: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
-                      }}
-                    >
-                      Upravit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(workout.id)}
-                      style={{
-                        padding: '8px 16px',
-                        background: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
-                      }}
-                    >
-                      Smazat
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </ScrollArea>
         )}
       </div>
     </div>
