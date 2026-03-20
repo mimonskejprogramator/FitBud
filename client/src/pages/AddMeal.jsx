@@ -1,5 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Utensils } from 'lucide-react';
 
 function AddMeal() {
   const navigate = useNavigate();
@@ -96,253 +102,149 @@ function AddMeal() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px' }}>
-      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-4 md:p-6 max-w-2xl">
         {/* Header */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '20px'
-        }}>
-          <h1 style={{ margin: 0 }}>Přidat jídlo</h1>
-          <button
-            onClick={() => navigate('/dashboard')}
-            style={{
-              padding: '8px 16px',
-              background: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Zpět na Dashboard
-          </button>
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+              <Utensils className="h-8 w-8" />
+              Přidat jídlo
+            </h1>
+          </div>
+          <Button onClick={() => navigate('/meals')} variant="outline" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Zpět
+          </Button>
         </div>
 
         {/* Formulář */}
-        <form onSubmit={handleSubmit} style={{
-          background: 'white',
-          padding: '30px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          {error && (
-            <div style={{
-              padding: '10px',
-              marginBottom: '20px',
-              background: '#f8d7da',
-              color: '#721c24',
-              border: '1px solid #f5c6cb',
-              borderRadius: '4px'
-            }}>
-              {error}
-            </div>
-          )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Nové jídlo</CardTitle>
+            <CardDescription>Zaznamenej své jídlo a makroživiny</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <Card className="border-destructive">
+                  <CardContent className="pt-6">
+                    <p className="text-destructive text-sm">{error}</p>
+                  </CardContent>
+                </Card>
+              )}
 
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Název jídla *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              placeholder="např. Snídaně - ovesná kaše"
-              style={{
-                width: '100%',
-                padding: '10px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="name">Název jídla *</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  placeholder="např. Snídaně - ovesná kaše"
+                />
+              </div>
 
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Kalorie (kcal) *
-            </label>
-            <input
-              type="number"
-              name="calories"
-              value={formData.calories}
-              onChange={handleChange}
-              required
-              min="0"
-              placeholder="např. 350"
-              style={{
-                width: '100%',
-                padding: '10px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box'
-              }}
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="calories">Kalorie (kcal) *</Label>
+                <Input
+                  id="calories"
+                  name="calories"
+                  type="number"
+                  value={formData.calories}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                  placeholder="např. 350"
+                />
+              </div>
 
-          {/* Makroživiny - nepovinné */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
-            gap: '10px',
-            marginBottom: '15px'
-          }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Bílkoviny (g)
-              </label>
-              <input
-                type="number"
-                name="protein"
-                value={formData.protein}
-                onChange={handleChange}
-                min="0"
-                placeholder="0"
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  boxSizing: 'border-box'
-                }}
-              />
-            </div>
+              {/* Makroživiny - nepovinné */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="protein">Bílkoviny (g)</Label>
+                  <Input
+                    id="protein"
+                    name="protein"
+                    type="number"
+                    value={formData.protein}
+                    onChange={handleChange}
+                    min="0"
+                    placeholder="0"
+                  />
+                </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Sacharidy (g)
-              </label>
-              <input
-                type="number"
-                name="carbs"
-                value={formData.carbs}
-                onChange={handleChange}
-                min="0"
-                placeholder="0"
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  boxSizing: 'border-box'
-                }}
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="carbs">Sacharidy (g)</Label>
+                  <Input
+                    id="carbs"
+                    name="carbs"
+                    type="number"
+                    value={formData.carbs}
+                    onChange={handleChange}
+                    min="0"
+                    placeholder="0"
+                  />
+                </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Tuky (g)
-              </label>
-              <input
-                type="number"
-                name="fats"
-                value={formData.fats}
-                onChange={handleChange}
-                min="0"
-                placeholder="0"
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  boxSizing: 'border-box'
-                }}
-              />
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="fats">Tuky (g)</Label>
+                  <Input
+                    id="fats"
+                    name="fats"
+                    type="number"
+                    value={formData.fats}
+                    onChange={handleChange}
+                    min="0"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Datum *
-              </label>
-              <input
-                type="date"
-                name="meal_date"
-                value={formData.meal_date}
-                onChange={handleChange}
-                required
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  boxSizing: 'border-box'
-                }}
-              />
-            </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="meal_date">Datum *</Label>
+                  <Input
+                    id="meal_date"
+                    name="meal_date"
+                    type="date"
+                    value={formData.meal_date}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-                Čas
-              </label>
-              <input
-                type="time"
-                name="meal_time"
-                value={formData.meal_time}
-                onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  fontSize: '16px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  boxSizing: 'border-box'
-                }}
-              />
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="meal_time">Čas</Label>
+                  <Input
+                    id="meal_time"
+                    name="meal_time"
+                    type="time"
+                    value={formData.meal_time}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-              Poznámky
-            </label>
-            <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-              rows="3"
-              placeholder="Volitelné poznámky..."
-              style={{
-                width: '100%',
-                padding: '10px',
-                fontSize: '16px',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                boxSizing: 'border-box',
-                resize: 'vertical'
-              }}
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="notes">Poznámky</Label>
+                <Textarea
+                  id="notes"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="Volitelné poznámky..."
+                />
+              </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: '100%',
-              padding: '12px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              color: 'white',
-              background: loading ? '#ccc' : '#28a745',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: loading ? 'not-allowed' : 'pointer'
-            }}
-          >
-            {loading ? 'Přidávám...' : 'Přidat jídlo'}
-          </button>
-        </form>
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? 'Přidávám...' : 'Přidat jídlo'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
