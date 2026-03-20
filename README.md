@@ -109,26 +109,6 @@ Všechny requesty kromě login/register musí mít v hlavičce:
 Authorization: Bearer <token>
 ```
 
-## Co funguje
-
-- ✅ Bezpečná autentizace (bcrypt + JWT)
-- ✅ Evidence jídel s makroživinami
-- ✅ Tracking tréninků (5 typů aktivit)
-- ✅ Sledování spánku s hodnocením kvality
-- ✅ Dashboard s denním přehledem
-- ✅ Grafy za posledních 7 dní
-- ✅ Export do CSV
-- ✅ Responzivní design (funguje na mobilu i desktopu)
-- ✅ Moderní UI (Shadcn/ui komponenty)
-
-## Co chci ještě přidat
-
-- [ ] Pitný režim (sledování vody)
-- [ ] Dark mode (CSS proměnné jsou připravené)
-- [ ] Toast notifikace (komponenta je připravená)
-- [ ] Týdenní/měsíční statistiky
-- [ ] Cíle a milníky
-- [ ] Filtry a vyhledávání
 
 ## Problémy, které jsem řešil
 
