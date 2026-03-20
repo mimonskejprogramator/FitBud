@@ -19,7 +19,10 @@ FitBud je moje ročníková práce, která kombinuje tracking výživy, fyzické
 **Frontend:**
 - React 18 + Vite
 - React Router pro navigaci
-- Inline styles (plánuju přejít na Tailwind)
+- Shadcn/ui komponenty (Radix UI primitives)
+- Tailwind CSS pro styling
+- Chart.js pro grafy a statistiky
+- Lucide React pro ikony
 
 **Backend:**
 - Node.js + Express
@@ -35,14 +38,26 @@ FitBud je moje ročníková práce, která kombinuje tracking výživy, fyzické
 
 ```
 FitBud/
-├── client/          # React frontend
+├── client/                 # React frontend
 │   ├── src/
-│   │   ├── pages/   # Login, Register, Dashboard
-│   │   └── App.jsx
+│   │   ├── components/     # UI komponenty
+│   │   │   ├── ui/         # Shadcn/ui komponenty
+│   │   │   ├── AppNav.jsx  # Navigace
+│   │   │   ├── Layout.jsx  # Layout wrapper
+│   │   │   ├── Loading.jsx
+│   │   │   └── EmptyState.jsx
+│   │   ├── pages/          # Stránky aplikace
+│   │   ├── utils/          # Pomocné funkce (export CSV)
+│   │   ├── hooks/          # Custom hooks (toast)
+│   │   ├── lib/            # Utility funkce
+│   │   ├── App.jsx         # Routing
+│   │   └── main.jsx        # Entry point
 │   └── package.json
-├── server/          # Express backend
-│   ├── routes/      # API endpointy
-│   ├── middleware/  # JWT auth
+├── server/                 # Express backend
+│   ├── routes/             # API endpointy
+│   ├── middleware/         # JWT auth
+│   ├── utils/              # Password hashing
+│   ├── data/               # SQLite databáze
 │   ├── database.js
 │   └── index.js
 └── docker-compose.yml
@@ -68,10 +83,21 @@ Všechny endpointy kromě autentizace vyžadují JWT token v hlavičce:
 Authorization: Bearer <token>
 ```
 
+## Hotové funkce
+
+- ✅ Uživatelské účty s bezpečnou autentizací (bcrypt + JWT)
+- ✅ Evidence jídel s makroživinami
+- ✅ Tracking tréninků s různými typy aktivit
+- ✅ Sledování spánku s hodnocením kvality
+- ✅ Dashboard s denním přehledem a statistikami
+- ✅ Export dat do CSV
+- ✅ Moderní UI s Shadcn/ui komponentami
+- ✅ Responzivní design (desktop + mobil)
+- ✅ Grafy a vizualizace dat (Chart.js)
+
 ## TODO
 
-- [ ] Grafy a statistiky
-- [ ] Export dat do CSV
-- [ ] Mobilní responzivita
 - [ ] Dark mode
 - [ ] Notifikace a připomínky
+- [ ] Týdenní/měsíční statistiky
+- [ ] Cíle a milníky
