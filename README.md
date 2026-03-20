@@ -1,103 +1,142 @@
 # FitBud
 
-Webová aplikace pro sledování zdravého životního stylu - kalorie, tréninky a spánek.
+Webová aplikace pro sledování zdravého životního stylu - jídla, tréninky a spánek na jednom místě.
 
 ## O projektu
 
-FitBud je moje ročníková práce, která kombinuje tracking výživy, fyzické aktivity a spánku do jedné aplikace. Cílem je mít přehledný dashboard s denními statistikami a možností dlouhodobě sledovat pokrok.
+FitBud je moje ročníková práce. Chtěl jsem něco, kde můžu sledovat kalorie, tréninky i spánek dohromady, protože existující aplikace buď dělají jen jedno, nebo jsou moc komplikované. Tak jsem si udělal vlastní verzi, která je jednoduchá a dělá přesně to, co potřebuju.
 
-## Hlavní funkce
+## Co to umí
 
-- Uživatelské účty (registrace/přihlášení)
-- Evidence jídel a kalorií
-- Tracking tréninků
-- Sledování spánku
-- Dashboard s denním přehledem
+- Registrace a přihlášení (bezpečné, s JWT tokeny)
+- Evidence jídel s makroživinami (kalorie, bílkoviny, sacharidy, tuky)
+- Tracking tréninků (cardio, posilovna, sport...)
+- Sledování spánku (délka, kvalita)
+- Dashboard s přehledem dne
+- Grafy a statistiky za posledních 7 dní
+- Export dat do CSV (pro Excel)
+
+## Jak to spustit
+
+### Varianta 1: Docker (nejjednodušší)
+
+Pokud máš Docker, stačí:
+
+```bash
+docker-compose up
+```
+
+Aplikace poběží na:
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3000
+
+### Varianta 2: Manuálně (bez Dockeru)
+
+**1. Backend:**
+```bash
+cd server
+npm install
+npm start
+```
+
+**2. Frontend (v novém terminálu):**
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Aplikace poběží na stejných portech jako u Dockeru.
+
+### První spuštění
+
+1. Otevři http://localhost:5173
+2. Klikni na "Registrovat se"
+3. Vytvoř účet (email + heslo)
+4. Přihlaš se a můžeš začít přidávat jídla, tréninky a spánek
 
 ## Technologie
 
 **Frontend:**
-- React 18 + Vite
-- React Router pro navigaci
-- Shadcn/ui komponenty (Radix UI primitives)
-- Tailwind CSS pro styling
-- Chart.js pro grafy a statistiky
-- Lucide React pro ikony
+- React 18 + Vite (rychlý dev server)
+- Shadcn/ui komponenty (moderní UI)
+- Tailwind CSS (utility-first styling)
+- Chart.js (grafy)
+- React Router (navigace)
 
 **Backend:**
-- Node.js + Express
-- SQLite databáze
-- JWT autentizace
-- bcrypt pro hashování hesel
-
-**Deployment:**
-- Docker + Docker Compose
-- Persistent volume pro databázi
+- Node.js + Express (REST API)
+- SQLite (databáze v jednom souboru)
+- JWT (autentizace)
+- bcrypt (bezpečné hashování hesel)
 
 ## Struktura projektu
 
 ```
 FitBud/
-├── client/                 # React frontend
+├── client/                 # Frontend (React)
 │   ├── src/
-│   │   ├── components/     # UI komponenty
-│   │   │   ├── ui/         # Shadcn/ui komponenty
-│   │   │   ├── AppNav.jsx  # Navigace
-│   │   │   ├── Layout.jsx  # Layout wrapper
-│   │   │   ├── Loading.jsx
-│   │   │   └── EmptyState.jsx
-│   │   ├── pages/          # Stránky aplikace
+│   │   ├── components/     # UI komponenty (navigace, karty...)
+│   │   ├── pages/          # Stránky (Dashboard, Meals, Workouts, Sleep, Stats)
 │   │   ├── utils/          # Pomocné funkce (export CSV)
-│   │   ├── hooks/          # Custom hooks (toast)
-│   │   ├── lib/            # Utility funkce
-│   │   ├── App.jsx         # Routing
-│   │   └── main.jsx        # Entry point
+│   │   └── App.jsx         # Routing
 │   └── package.json
-├── server/                 # Express backend
-│   ├── routes/             # API endpointy
-│   ├── middleware/         # JWT auth
-│   ├── utils/              # Password hashing
-│   ├── data/               # SQLite databáze
-│   ├── database.js
+│
+├── server/                 # Backend (Express)
+│   ├── routes/             # API endpointy (auth, meals, workouts, sleep)
+│   ├── middleware/         # JWT autentizace
+│   ├── data/               # SQLite databáze (fitbud.db)
 │   └── index.js
-└── docker-compose.yml
+│
+└── docker-compose.yml      # Docker konfigurace
 ```
 
-## API Dokumentace
+## API
 
-Kompletní API dokumentace je dostupná po spuštění serveru na `http://localhost:3000/api/health`
+Backend běží na `http://localhost:3000` a poskytuje REST API.
 
-### Základní endpointy:
+**Autentizace:**
+- `POST /api/auth/register` - Registrace nového uživatele
+- `POST /api/auth/login` - Přihlášení (vrací JWT token)
 
-- `POST /api/auth/register` - Registrace
-- `POST /api/auth/login` - Přihlášení
-- `GET /api/meals` - Seznam jídel (vyžaduje JWT)
-- `POST /api/meals` - Přidání jídla (vyžaduje JWT)
-- `GET /api/workouts` - Seznam tréninků (vyžaduje JWT)
-- `POST /api/workouts` - Přidání tréninku (vyžaduje JWT)
-- `GET /api/sleep` - Záznamy spánku (vyžaduje JWT)
-- `POST /api/sleep` - Přidání záznamu (vyžaduje JWT)
+**Data (vyžadují JWT token v hlavičce):**
+- `GET/POST/PUT/DELETE /api/meals` - Jídla
+- `GET/POST/PUT/DELETE /api/workouts` - Tréninky
+- `GET/POST/PUT/DELETE /api/sleep` - Spánek
 
-Všechny endpointy kromě autentizace vyžadují JWT token v hlavičce:
+Všechny requesty kromě login/register musí mít v hlavičce:
 ```
 Authorization: Bearer <token>
 ```
 
-## Hotové funkce
+## Co funguje
 
-- ✅ Uživatelské účty s bezpečnou autentizací (bcrypt + JWT)
+- ✅ Bezpečná autentizace (bcrypt + JWT)
 - ✅ Evidence jídel s makroživinami
-- ✅ Tracking tréninků s různými typy aktivit
+- ✅ Tracking tréninků (5 typů aktivit)
 - ✅ Sledování spánku s hodnocením kvality
-- ✅ Dashboard s denním přehledem a statistikami
-- ✅ Export dat do CSV
-- ✅ Moderní UI s Shadcn/ui komponentami
-- ✅ Responzivní design (desktop + mobil)
-- ✅ Grafy a vizualizace dat (Chart.js)
+- ✅ Dashboard s denním přehledem
+- ✅ Grafy za posledních 7 dní
+- ✅ Export do CSV
+- ✅ Responzivní design (funguje na mobilu i desktopu)
+- ✅ Moderní UI (Shadcn/ui komponenty)
 
-## TODO
+## Co chci ještě přidat
 
-- [ ] Dark mode
-- [ ] Notifikace a připomínky
+- [ ] Pitný režim (sledování vody)
+- [ ] Dark mode (CSS proměnné jsou připravené)
+- [ ] Toast notifikace (komponenta je připravená)
 - [ ] Týdenní/měsíční statistiky
 - [ ] Cíle a milníky
+- [ ] Filtry a vyhledávání
+
+## Problémy, které jsem řešil
+
+- **CORS** - musel jsem nastavit CORS middleware, aby frontend mohl volat backend
+- **Spánek přes půlnoc** - výpočet délky spánku, když čas usnutí > čas probuzení
+- **CSV export s češtinou** - musel jsem přidat BOM (Byte Order Mark) pro Excel
+- **Responzivní navigace** - na mobilu se navigace přesouvá dolů jako bottom bar
+
+## Autor
+
+Martin Rývora - ročníková práce 2026
