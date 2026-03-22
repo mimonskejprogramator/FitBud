@@ -28,5 +28,6 @@ pnpm-debug.log*
 *.db-journal
 server/data/*.db
 
-# Teoretická část (pracovní soubor)
+# Teoretická část (pracovní soubory)
 TEORETICKA_CAST.md
+TEORETICKA_CAST_FINAL.md
