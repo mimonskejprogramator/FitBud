@@ -1,6 +1,11 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_change_in_production';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  console.error('Chybí JWT_SECRET v .env souboru. Zkopíruj .env.example do .env.');
+  process.exit(1);
+}
 
 /**
  * Middleware pro ověření JWT tokenu

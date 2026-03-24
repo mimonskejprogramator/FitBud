@@ -1,15 +1,14 @@
+// Načtení env proměnných musí být úplně první, jinak ostatní moduly nevidí JWT_SECRET
+import 'dotenv/config';
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import { initDatabase } from './database.js';
 import authRoutes from './routes/auth.js';
 import mealsRoutes from './routes/meals.js';
 import workoutsRoutes from './routes/workouts.js';
 import sleepRoutes from './routes/sleep.js';
-
-// Načtení env proměnných
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
