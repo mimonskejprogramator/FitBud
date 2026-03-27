@@ -1,9 +1,19 @@
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import { getDatabase } from '../database.js';
 import { hashPassword, comparePassword } from '../utils/password.js';
 import { generateToken } from '../middleware/auth.js';
 
 const router = express.Router();
+
+// Omezení pokusů o přihlášení - max 5 za 15 minut z jedné IP
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Příliš mnoho pokusů o přihlášení, zkus to za 15 minut.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 /**
  * POST /api/auth/register
@@ -79,7 +89,7 @@ router.post('/register', async (req, res) => {
  * POST /api/auth/login
  * Přihlášení uživatele
  */
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
