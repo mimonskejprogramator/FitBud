@@ -1,5 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, Moon } from 'lucide-react';
 
 function EditSleep() {
   const navigate = useNavigate();
@@ -110,80 +117,136 @@ function EditSleep() {
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}><p>Načítám...</p></div>;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Načítám...</p>
+      </div>
+    );
   }
 
-  const inputStyle = {
-    width: '100%',
-    padding: '10px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    fontSize: '16px',
-    boxSizing: 'border-box'
-  };
-
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px' }}>
-      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h1 style={{ margin: 0 }}>Upravit záznam spánku</h1>
-          <button onClick={() => navigate('/sleep')} style={{ padding: '10px 20px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto p-4 md:p-6 max-w-2xl">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+            <Moon className="h-8 w-8" />
+            Upravit záznam spánku
+          </h1>
+          <Button onClick={() => navigate('/sleep')} variant="outline" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
             Zpět
-          </button>
+          </Button>
         </div>
 
-        {error && (
-          <div style={{ padding: '15px', marginBottom: '20px', background: '#f8d7da', color: '#721c24', border: '1px solid #f5c6cb', borderRadius: '4px' }}>
-            {error}
-          </div>
-        )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Úprava záznamu</CardTitle>
+            <CardDescription>Změň údaje a ulož je</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <Card className="border-destructive">
+                  <CardContent className="pt-6">
+                    <p className="text-destructive text-sm">{error}</p>
+                  </CardContent>
+                </Card>
+              )}
 
-        <form onSubmit={handleSubmit} style={{ background: 'white', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Datum *</label>
-            <input type="date" name="sleep_date" value={formData.sleep_date} onChange={handleChange} required style={inputStyle} />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="sleep_date">Datum *</Label>
+                <Input
+                  id="sleep_date"
+                  name="sleep_date"
+                  type="date"
+                  value={formData.sleep_date}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Čas usnutí</label>
-              <input type="time" name="bedtime" value={formData.bedtime} onChange={handleChange} onBlur={calculateDuration} style={inputStyle} />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Čas probuzení</label>
-              <input type="time" name="wake_time" value={formData.wake_time} onChange={handleChange} onBlur={calculateDuration} style={inputStyle} />
-            </div>
-          </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bedtime">Čas usnutí</Label>
+                  <Input
+                    id="bedtime"
+                    name="bedtime"
+                    type="time"
+                    value={formData.bedtime}
+                    onChange={handleChange}
+                    onBlur={calculateDuration}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="wake_time">Čas probuzení</Label>
+                  <Input
+                    id="wake_time"
+                    name="wake_time"
+                    type="time"
+                    value={formData.wake_time}
+                    onChange={handleChange}
+                    onBlur={calculateDuration}
+                  />
+                </div>
+              </div>
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Délka spánku (hodiny) *</label>
-            <input type="number" name="duration_hours" value={formData.duration_hours} onChange={handleChange} step="0.1" min="0" max="24" required style={inputStyle} />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="duration_hours">Délka spánku (hodiny) *</Label>
+                <Input
+                  id="duration_hours"
+                  name="duration_hours"
+                  type="number"
+                  value={formData.duration_hours}
+                  onChange={handleChange}
+                  step="0.1"
+                  min="0"
+                  max="24"
+                  required
+                />
+              </div>
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Kvalita spánku *</label>
-            <select name="quality" value={formData.quality} onChange={handleChange} required style={inputStyle}>
-              <option value="excellent">Výborná</option>
-              <option value="good">Dobrá</option>
-              <option value="fair">Průměrná</option>
-              <option value="poor">Špatná</option>
-            </select>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="quality">Kvalita spánku *</Label>
+                <Select
+                  name="quality"
+                  value={formData.quality}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, quality: value }))}
+                  required
+                >
+                  <SelectTrigger id="quality">
+                    <SelectValue placeholder="Vyber kvalitu spánku" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="excellent">Výborná</SelectItem>
+                    <SelectItem value="good">Dobrá</SelectItem>
+                    <SelectItem value="fair">Průměrná</SelectItem>
+                    <SelectItem value="poor">Špatná</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Poznámky</label>
-            <textarea name="notes" value={formData.notes} onChange={handleChange} rows="3" style={{ ...inputStyle, resize: 'vertical' }} />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="notes">Poznámky</Label>
+                <Textarea
+                  id="notes"
+                  name="notes"
+                  value={formData.notes}
+                  onChange={handleChange}
+                  rows={3}
+                />
+              </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button type="submit" disabled={saving} style={{ flex: 1, padding: '12px', background: saving ? '#ccc' : '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: saving ? 'not-allowed' : 'pointer', fontSize: '16px', fontWeight: 'bold' }}>
-              {saving ? 'Ukládám...' : 'Uložit změny'}
-            </button>
-            <button type="button" onClick={() => navigate('/sleep')} style={{ padding: '12px 20px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }}>
-              Zrušit
-            </button>
-          </div>
-        </form>
+              <div className="flex gap-2">
+                <Button type="submit" disabled={saving} className="flex-1">
+                  {saving ? 'Ukládám...' : 'Uložit změny'}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => navigate('/sleep')}>
+                  Zrušit
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
