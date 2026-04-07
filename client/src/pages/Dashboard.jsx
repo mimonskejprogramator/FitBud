@@ -31,6 +31,10 @@ ChartJS.register(
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [calorieGoal, setCalorieGoal] = useState(() => {
+    const stored = localStorage.getItem('calorieGoal');
+    return stored ? parseInt(stored) : 2000;
+  });
   const [stats, setStats] = useState({
     todayMeals: [],
     todayWorkouts: [],
@@ -147,6 +151,21 @@ function Dashboard() {
     navigate('/login');
   };
 
+  // Změna denního cíle kalorií - jednoduchý prompt, hodnota se uloží do localStorage
+  const handleChangeGoal = () => {
+    const input = prompt('Denní cíl kalorií (kcal):', calorieGoal);
+    if (input === null) return;
+    const parsed = parseInt(input);
+    if (!isNaN(parsed) && parsed > 0 && parsed < 20000) {
+      setCalorieGoal(parsed);
+      localStorage.setItem('calorieGoal', parsed.toString());
+    }
+  };
+
+  // Procento splnění cíle, ořezané na 0-100 pro šířku progress baru
+  const caloriePercent = Math.min(100, Math.round((stats.totalCaloriesIn / calorieGoal) * 100));
+  const isOverGoal = stats.totalCaloriesIn > calorieGoal;
+
   if (loading) {
     return <Loading message="Načítám dashboard..." />;
   }
@@ -214,6 +233,7 @@ function Dashboard() {
                 <HoverCardTrigger asChild>
                   <div className="text-4xl font-bold text-foreground cursor-pointer hover:text-primary transition-colors">
                     {stats.totalCaloriesIn}
+                    <span className="text-lg text-muted-foreground font-normal"> / {calorieGoal}</span>
                   </div>
                 </HoverCardTrigger>
                 <HoverCardContent className="w-80">
@@ -234,9 +254,26 @@ function Dashboard() {
                   </div>
                 </HoverCardContent>
               </HoverCard>
-              <p className="text-xs text-muted-foreground mt-1">
-                {stats.todayMeals.length} jídel dnes
-              </p>
+
+              {/* Progress bar denního cíle */}
+              <div className="mt-3 h-2 w-full bg-muted rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all ${isOverGoal ? 'bg-destructive' : 'bg-primary'}`}
+                  style={{ width: `${caloriePercent}%` }}
+                />
+              </div>
+
+              <div className="flex justify-between items-center mt-1">
+                <p className="text-xs text-muted-foreground">
+                  {caloriePercent}% denního cíle
+                </p>
+                <button
+                  onClick={handleChangeGoal}
+                  className="text-xs text-muted-foreground hover:text-primary underline"
+                >
+                  změnit cíl
+                </button>
+              </div>
             </CardContent>
           </Card>
 
