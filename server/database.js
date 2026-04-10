@@ -96,6 +96,18 @@ async function createTables() {
     )
   `);
 
+  // Tabulka pitného režimu - každý záznam = jeden hlt/sklenice
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS water_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      amount_ml INTEGER NOT NULL,
+      log_date DATE NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+
   console.log('✅ Databázové tabulky vytvořeny/ověřeny');
 }
 
