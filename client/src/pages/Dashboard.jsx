@@ -35,6 +35,11 @@ function Dashboard() {
     const stored = localStorage.getItem('calorieGoal');
     return stored ? parseInt(stored) : 2000;
   });
+  const [waterGoal] = useState(() => {
+    const stored = localStorage.getItem('waterGoal');
+    return stored ? parseInt(stored) : 2500;
+  });
+  const [waterToday, setWaterToday] = useState(0);
   const [stats, setStats] = useState({
     todayMeals: [],
     todayWorkouts: [],
@@ -99,6 +104,13 @@ function Dashboard() {
       });
       const sleepData = await sleepRes.json();
       const todaySleep = sleepData.sleep.find(s => s.sleep_date === today);
+
+      // Pitný režim - dnešní součet z API
+      const waterRes = await fetch('http://localhost:3000/api/water/today', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const waterData = await waterRes.json();
+      setWaterToday(waterData.total || 0);
 
       // Příprava dat pro grafy - posledních 7 dní
       const last7Days = [];
@@ -165,6 +177,28 @@ function Dashboard() {
   // Procento splnění cíle, ořezané na 0-100 pro šířku progress baru
   const caloriePercent = Math.min(100, Math.round((stats.totalCaloriesIn / calorieGoal) * 100));
   const isOverGoal = stats.totalCaloriesIn > calorieGoal;
+
+  // Přidání vody - rychlé tlačítko pošle POST a aktualizuje stav
+  const handleAddWater = async (amount) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:3000/api/water', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ amount_ml: amount })
+      });
+      if (res.ok) {
+        setWaterToday(prev => prev + amount);
+      }
+    } catch (err) {
+      console.error('Chyba při ukládání vody:', err);
+    }
+  };
+
+  const waterPercent = Math.min(100, Math.round((waterToday / waterGoal) * 100));
 
   if (loading) {
     return <Loading message="Načítám dashboard..." />;
@@ -320,6 +354,33 @@ function Dashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Pitný režim */}
+        <Card className="mb-6">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Pitný režim</CardTitle>
+            <CardDescription>Dnes vypito: {waterToday} ml / {waterGoal} ml</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-2 w-full bg-muted rounded-full overflow-hidden mb-3">
+              <div
+                className="h-full bg-sky-500 transition-all"
+                style={{ width: `${waterPercent}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant="outline" onClick={() => handleAddWater(250)}>
+                +250 ml
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => handleAddWater(500)}>
+                +500 ml
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => handleAddWater(750)}>
+                +750 ml
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Grafy */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
