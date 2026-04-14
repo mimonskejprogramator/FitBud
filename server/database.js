@@ -108,6 +108,19 @@ async function createTables() {
     )
   `);
 
+  // Tabulka záznamů váhy - jeden záznam za měření (typicky ráno)
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS weight_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      weight_kg REAL NOT NULL,
+      log_date DATE NOT NULL,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+
   console.log('✅ Databázové tabulky vytvořeny/ověřeny');
 }
 

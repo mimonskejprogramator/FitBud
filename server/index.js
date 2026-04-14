@@ -10,6 +10,7 @@ import mealsRoutes from './routes/meals.js';
 import workoutsRoutes from './routes/workouts.js';
 import sleepRoutes from './routes/sleep.js';
 import waterRoutes from './routes/water.js';
+import weightRoutes from './routes/weight.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -50,6 +51,9 @@ app.use('/api/sleep', sleepRoutes);
 
 // Water routes
 app.use('/api/water', waterRoutes);
+
+// Weight routes
+app.use('/api/weight', weightRoutes);
 
 // Spuštění serveru s inicializací databáze
 async function startServer() {
