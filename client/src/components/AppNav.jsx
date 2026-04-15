@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings, Home, Utensils, Dumbbell, Moon, BarChart3 } from 'lucide-react';
+import { Settings, Home, Utensils, Dumbbell, Moon, BarChart3, Scale } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 
@@ -40,6 +40,7 @@ function AppNav({ user }) {
     { path: '/meals', label: 'Jídla', icon: Utensils },
     { path: '/workouts', label: 'Tréninky', icon: Dumbbell },
     { path: '/sleep', label: 'Spánek', icon: Moon },
+    { path: '/weight', label: 'Váha', icon: Scale },
     { path: '/stats', label: 'Statistiky', icon: BarChart3 },
   ];
 

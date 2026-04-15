@@ -23,6 +23,9 @@ import Sleep from './pages/Sleep';
 import AddSleep from './pages/AddSleep';
 import EditSleep from './pages/EditSleep';
 
+// Váha
+import Weight from './pages/Weight';
+
 // Komponenty
 import Layout from './components/Layout';
 import { Toaster } from "@/components/ui/toaster";
@@ -58,6 +61,9 @@ function App() {
         <Route path="/sleep" element={<Sleep />} />
         <Route path="/sleep/add" element={<AddSleep />} />
         <Route path="/sleep/edit/:id" element={<EditSleep />} />
+
+        {/* Váha */}
+        <Route path="/weight" element={<Weight />} />
 
         {/* Výchozí přesměrování na login */}
         <Route path="/" element={<Navigate to="/login" replace />} />
