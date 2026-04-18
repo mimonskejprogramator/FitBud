@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings, Home, Utensils, Dumbbell, Moon, BarChart3, Scale } from 'lucide-react';
+import { Settings, Home, Utensils, Dumbbell, Moon, BarChart3, Scale, Sun } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 
@@ -13,6 +13,19 @@ function AppNav({ user }) {
   const { toast } = useToast();
   const [calorieGoal, setCalorieGoal] = useState(2000);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    if (next) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -73,6 +86,15 @@ function AppNav({ user }) {
           {user?.name || user?.email}
         </span>
         
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleTheme}
+          aria-label="Přepnout téma"
+        >
+          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
+
         <Sheet open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2">
