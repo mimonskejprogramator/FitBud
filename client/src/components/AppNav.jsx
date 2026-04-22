@@ -60,7 +60,13 @@ function AppNav({ user }) {
   return (
     <div className="bg-card border-b px-6 py-3 flex justify-between items-center sticky top-0 z-10 shadow-sm">
       <div className="flex items-center gap-6">
-        <h1 className="text-xl font-bold text-primary">FitBud</h1>
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="text-xl font-bold text-primary hover:opacity-80 transition-opacity"
+          aria-label="Přejít na dashboard"
+        >
+          FitBud
+        </button>
         <nav className="hidden md:flex gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;

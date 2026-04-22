@@ -127,7 +127,6 @@ function Meals() {
         {/* Seznam jídel */}
         {meals.length === 0 ? (
           <EmptyState
-            icon="🍽️"
             title="Zatím žádná jídla"
             message="Začni sledovat své stravování přidáním prvního jídla"
             actionText="+ Přidat první jídlo"

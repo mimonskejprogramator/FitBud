@@ -144,7 +144,6 @@ function Sleep() {
 
         {sleepRecords.length === 0 ? (
           <EmptyState
-            icon="😴"
             title="Zatím žádné záznamy spánku"
             message="Začni sledovat kvalitu svého spánku přidáním prvního záznamu"
             actionText="+ Přidat první záznam"

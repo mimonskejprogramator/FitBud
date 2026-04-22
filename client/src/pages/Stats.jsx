@@ -12,6 +12,8 @@ import {
   Legend
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { exportAllData } from '../utils/exportCSV';
 
 // Registrace komponent Chart.js - bez toho to nefunguje
@@ -34,9 +36,19 @@ function Stats() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [exportMessage, setExportMessage] = useState('');
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
 
   useEffect(() => {
     loadAllData();
+  }, []);
+
+  // Sledování změny tématu kvůli barvám v grafech
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
   }, []);
 
   const loadAllData = async () => {
@@ -146,20 +158,24 @@ function Stats() {
     ]
   };
 
+  const tickColor = isDark ? '#cbd5e1' : '#475569';
+  const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: { position: 'top' }
+      legend: { position: 'top', labels: { color: tickColor } }
     },
     scales: {
-      y: { beginAtZero: true }
+      x: { ticks: { color: tickColor }, grid: { color: gridColor } },
+      y: { beginAtZero: true, ticks: { color: tickColor }, grid: { color: gridColor } }
     }
   };
 
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center' }}>
-        <p>Načítám statistiky...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Načítám statistiky...</p>
       </div>
     );
   }
@@ -172,112 +188,133 @@ function Stats() {
     setTimeout(() => setExportMessage(''), 5000);
   };
 
+  const hasNoData = meals.length === 0 && workouts.length === 0 && sleepRecords.length === 0;
+
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-          <h1 style={{ margin: 0 }}>Statistiky a grafy</h1>
-          <button
-            onClick={handleExportAll}
-            disabled={meals.length === 0 && workouts.length === 0 && sleepRecords.length === 0}
-            style={{
-              padding: '12px 24px',
-              background: (meals.length === 0 && workouts.length === 0 && sleepRecords.length === 0) ? '#ccc' : '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: (meals.length === 0 && workouts.length === 0 && sleepRecords.length === 0) ? 'not-allowed' : 'pointer',
-              fontWeight: 'bold',
-              fontSize: '14px'
-            }}
-          >
-            📥 Exportovat všechna data
-          </button>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-5xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
+          <h1 className="text-2xl font-bold">Statistiky a grafy</h1>
+          <Button onClick={handleExportAll} disabled={hasNoData}>
+            Exportovat všechna data
+          </Button>
         </div>
 
         {error && (
-          <div style={{ padding: '15px', marginBottom: '20px', background: '#f8d7da', color: '#721c24', borderRadius: '4px' }}>
-            {error}
-          </div>
+          <Card className="border-destructive mb-4">
+            <CardContent className="pt-6">
+              <p className="text-destructive">{error}</p>
+            </CardContent>
+          </Card>
         )}
 
         {exportMessage && (
-          <div style={{ padding: '15px', marginBottom: '20px', background: '#d4edda', color: '#155724', borderRadius: '4px' }}>
-            {exportMessage}
-          </div>
+          <Card className="mb-4">
+            <CardContent className="pt-6">
+              <p className="text-sm">{exportMessage}</p>
+            </CardContent>
+          </Card>
         )}
 
         {/* Souhrnné karty */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px', marginBottom: '30px' }}>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <div style={{ fontSize: '13px', color: '#666', marginBottom: '8px' }}>Celkem přijato</div>
-            <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#28a745' }}>{totalCaloriesIn}</div>
-            <div style={{ fontSize: '12px', color: '#999' }}>kcal celkem</div>
-          </div>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <div style={{ fontSize: '13px', color: '#666', marginBottom: '8px' }}>Celkem spáleno</div>
-            <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#dc3545' }}>{totalCaloriesOut}</div>
-            <div style={{ fontSize: '12px', color: '#999' }}>kcal celkem</div>
-          </div>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <div style={{ fontSize: '13px', color: '#666', marginBottom: '8px' }}>Průměrný spánek</div>
-            <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#007bff' }}>{avgSleep}h</div>
-            <div style={{ fontSize: '12px', color: '#999' }}>za všechny záznamy</div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Celkem přijato</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400">{totalCaloriesIn}</div>
+              <p className="text-xs text-muted-foreground mt-1">kcal celkem</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Celkem spáleno</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-red-600 dark:text-red-400">{totalCaloriesOut}</div>
+              <p className="text-xs text-muted-foreground mt-1">kcal celkem</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>Průměrný spánek</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{avgSleep}h</div>
+              <p className="text-xs text-muted-foreground mt-1">za všechny záznamy</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Graf kalorií */}
-        <div style={{ background: 'white', padding: '25px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '25px' }}>
-          <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Kalorie za posledních 7 dní</h2>
-          <Bar data={caloriesChartData} options={chartOptions} />
-        </div>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-base">Kalorie za posledních 7 dní</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Bar data={caloriesChartData} options={chartOptions} />
+          </CardContent>
+        </Card>
 
         {/* Graf spánku */}
-        <div style={{ background: 'white', padding: '25px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '25px' }}>
-          <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Délka spánku za posledních 7 dní</h2>
-          <Line data={sleepChartData} options={{
-            ...chartOptions,
-            plugins: { ...chartOptions.plugins },
-            scales: { y: { beginAtZero: true, max: 12, title: { display: true, text: 'Hodiny' } } }
-          }} />
-        </div>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-base">Délka spánku za posledních 7 dní</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Line data={sleepChartData} options={{
+              ...chartOptions,
+              scales: {
+                x: { ticks: { color: tickColor }, grid: { color: gridColor } },
+                y: { beginAtZero: true, max: 12, ticks: { color: tickColor }, grid: { color: gridColor }, title: { display: true, text: 'Hodiny', color: tickColor } }
+              }
+            }} />
+          </CardContent>
+        </Card>
 
         {/* Přehled aktivit */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-          <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-            <h3 style={{ marginTop: 0 }}>Počty záznamů</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: '#f8f9fa', borderRadius: '4px' }}>
-                <span>🥗 Jídla celkem</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Počty záznamů</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <div className="flex justify-between px-3 py-2 bg-muted rounded">
+                <span>Jídla celkem</span>
                 <strong>{meals.length}</strong>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: '#f8f9fa', borderRadius: '4px' }}>
-                <span>💪 Tréninky celkem</span>
+              <div className="flex justify-between px-3 py-2 bg-muted rounded">
+                <span>Tréninky celkem</span>
                 <strong>{workouts.length}</strong>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: '#f8f9fa', borderRadius: '4px' }}>
-                <span>😴 Záznamy spánku</span>
+              <div className="flex justify-between px-3 py-2 bg-muted rounded">
+                <span>Záznamy spánku</span>
                 <strong>{sleepRecords.length}</strong>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-            <h3 style={{ marginTop: 0 }}>Typy tréninků</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Typy tréninků</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
               {['cardio', 'strength', 'flexibility', 'sports', 'other'].map(type => {
                 const count = workouts.filter(w => w.workout_type === type).length;
                 const labels = { cardio: 'Kardio', strength: 'Posilování', flexibility: 'Protažení', sports: 'Sport', other: 'Jiné' };
                 return count > 0 ? (
-                  <div key={type} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px', background: '#f8f9fa', borderRadius: '4px' }}>
+                  <div key={type} className="flex justify-between px-3 py-2 bg-muted rounded">
                     <span>{labels[type]}</span>
                     <strong>{count}x</strong>
                   </div>
                 ) : null;
               })}
-              {workouts.length === 0 && <p style={{ color: '#999', fontSize: '14px' }}>Zatím žádné tréninky</p>}
-            </div>
-          </div>
+              {workouts.length === 0 && (
+                <p className="text-sm text-muted-foreground">Zatím žádné tréninky</p>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

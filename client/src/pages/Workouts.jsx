@@ -137,7 +137,6 @@ function Workouts() {
         {/* Seznam tréninků */}
         {workouts.length === 0 ? (
           <EmptyState
-            icon="💪"
             title="Zatím žádné tréninky"
             message="Začni sledovat svou aktivitu přidáním prvního tréninku"
             actionText="+ Přidat první trénink"
