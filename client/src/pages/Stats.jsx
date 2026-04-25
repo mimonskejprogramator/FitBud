@@ -15,6 +15,7 @@ import { Bar, Line } from 'react-chartjs-2';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { exportAllData } from '../utils/exportCSV';
+import { API_URL } from "@/lib/api";
 
 // Registrace komponent Chart.js - bez toho to nefunguje
 ChartJS.register(
@@ -61,9 +62,9 @@ function Stats() {
 
       // Načtení všech dat najednou
       const [mealsRes, workoutsRes, sleepRes] = await Promise.all([
-        fetch('http://localhost:3000/api/meals', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3000/api/workouts', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:3000/api/sleep', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${API_URL}/api/meals`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${API_URL}/api/workouts`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${API_URL}/api/sleep`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
 
       const mealsData = await mealsRes.json();

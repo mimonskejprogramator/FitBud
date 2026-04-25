@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { API_URL } from "@/lib/api";
 
 ChartJS.register(
   CategoryScale,
@@ -81,7 +82,7 @@ function Dashboard() {
       const today = new Date().toISOString().split('T')[0]; // formát YYYY-MM-DD
 
       // Načtení jídel z API
-      const mealsRes = await fetch('http://localhost:3000/api/meals', {
+      const mealsRes = await fetch(`${API_URL}/api/meals`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const mealsData = await mealsRes.json();
@@ -91,7 +92,7 @@ function Dashboard() {
       const totalCaloriesIn = todayMeals.reduce((sum, m) => sum + m.calories, 0);
 
       // Tréninky
-      const workoutsRes = await fetch('http://localhost:3000/api/workouts', {
+      const workoutsRes = await fetch(`${API_URL}/api/workouts`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const workoutsData = await workoutsRes.json();
@@ -99,14 +100,14 @@ function Dashboard() {
       const totalCaloriesOut = todayWorkouts.reduce((sum, w) => sum + (w.calories_burned || 0), 0);
 
       // Spánek - tady používám find místo filter, protože je jen jeden záznam za den
-      const sleepRes = await fetch('http://localhost:3000/api/sleep', {
+      const sleepRes = await fetch(`${API_URL}/api/sleep`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const sleepData = await sleepRes.json();
       const todaySleep = sleepData.sleep.find(s => s.sleep_date === today);
 
       // Pitný režim - dnešní součet z API
-      const waterRes = await fetch('http://localhost:3000/api/water/today', {
+      const waterRes = await fetch(`${API_URL}/api/water/today`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const waterData = await waterRes.json();
@@ -182,7 +183,7 @@ function Dashboard() {
   const handleAddWater = async (amount) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:3000/api/water', {
+      const res = await fetch(`${API_URL}/api/water`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

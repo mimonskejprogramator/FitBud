@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Dumbbell } from 'lucide-react';
+import { API_URL } from "@/lib/api";
 
 function EditWorkout() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ function EditWorkout() {
         return;
       }
 
-      const response = await fetch(`http://localhost:3000/api/workouts/${id}`, {
+      const response = await fetch(`${API_URL}/api/workouts/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -76,7 +77,7 @@ function EditWorkout() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/workouts/${id}`, {
+      const response = await fetch(`${API_URL}/api/workouts/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -1,3 +1,5 @@
+import { API_URL } from "../lib/api";
+
 // Pomocné funkce pro export dat do CSV formátu
 
 // Převod pole objektů na CSV string
@@ -83,9 +85,9 @@ export const exportAllData = async (token) => {
   try {
     // Načtení všech dat
     const [mealsRes, workoutsRes, sleepRes] = await Promise.all([
-      fetch('http://localhost:3000/api/meals', { headers: { 'Authorization': `Bearer ${token}` } }),
-      fetch('http://localhost:3000/api/workouts', { headers: { 'Authorization': `Bearer ${token}` } }),
-      fetch('http://localhost:3000/api/sleep', { headers: { 'Authorization': `Bearer ${token}` } })
+      fetch(`${API_URL}/api/meals`, { headers: { 'Authorization': `Bearer ${token}` } }),
+      fetch(`${API_URL}/api/workouts`, { headers: { 'Authorization': `Bearer ${token}` } }),
+      fetch(`${API_URL}/api/sleep`, { headers: { 'Authorization': `Bearer ${token}` } })
     ]);
 
     const mealsData = await mealsRes.json();

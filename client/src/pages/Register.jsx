@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { API_URL } from "@/lib/api";
 
 function Register() {
   const [name, setName] = useState('');
@@ -20,7 +21,7 @@ function Register() {
 
     try {
       // Registrace nového uživatele
-      const response = await fetch('http://localhost:3000/api/auth/register', {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

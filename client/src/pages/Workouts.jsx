@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dumbbell, Plus, Download, Pencil, Trash2, Clock, Flame } from 'lucide-react';
+import { API_URL } from "@/lib/api";
 
 function Workouts() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ function Workouts() {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/api/workouts', {
+      const response = await fetch(`${API_URL}/api/workouts`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -57,7 +58,7 @@ function Workouts() {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/workouts/${id}`, {
+      const response = await fetch(`${API_URL}/api/workouts/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

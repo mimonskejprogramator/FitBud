@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Scale, Trash2 } from 'lucide-react';
+import { API_URL } from "@/lib/api";
 
 function Weight() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ function Weight() {
         navigate('/login');
         return;
       }
-      const res = await fetch('http://localhost:3000/api/weight', {
+      const res = await fetch(`${API_URL}/api/weight`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -47,7 +48,7 @@ function Weight() {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/api/weight', {
+      const res = await fetch(`${API_URL}/api/weight`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +69,7 @@ function Weight() {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/api/weight/${id}`, {
+      const res = await fetch(`${API_URL}/api/weight/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Moon } from 'lucide-react';
+import { API_URL } from "@/lib/api";
 
 function EditSleep() {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ function EditSleep() {
         return;
       }
 
-      const response = await fetch(`http://localhost:3000/api/sleep/${id}`, {
+      const response = await fetch(`${API_URL}/api/sleep/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -93,7 +94,7 @@ function EditSleep() {
         duration_hours: parseFloat(formData.duration_hours)
       };
 
-      const response = await fetch(`http://localhost:3000/api/sleep/${id}`, {
+      const response = await fetch(`${API_URL}/api/sleep/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

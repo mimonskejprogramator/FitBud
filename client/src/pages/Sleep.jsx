@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Moon, Plus, Download, Pencil, Trash2, Clock } from 'lucide-react';
+import { API_URL } from "@/lib/api";
 
 function Sleep() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ function Sleep() {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/api/sleep', {
+      const response = await fetch(`${API_URL}/api/sleep`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -55,7 +56,7 @@ function Sleep() {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/sleep/${id}`, {
+      const response = await fetch(`${API_URL}/api/sleep/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

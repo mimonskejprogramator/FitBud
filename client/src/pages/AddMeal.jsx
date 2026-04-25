@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Utensils } from 'lucide-react';
+import { API_URL } from "@/lib/api";
 
 function AddMeal() {
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ function AddMeal() {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/api/meals', {
+      const response = await fetch(`${API_URL}/api/meals`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

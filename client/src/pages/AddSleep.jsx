@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Moon } from 'lucide-react';
+import { API_URL } from "@/lib/api";
 
 function AddSleep() {
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ function AddSleep() {
         duration_hours: parseFloat(formData.duration_hours)
       };
 
-      const response = await fetch('http://localhost:3000/api/sleep', {
+      const response = await fetch(`${API_URL}/api/sleep`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

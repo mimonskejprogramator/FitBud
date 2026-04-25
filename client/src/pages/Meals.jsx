@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Utensils, Plus, Download, Pencil, Trash2 } from 'lucide-react';
+import { API_URL } from "@/lib/api";
 
 function Meals() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ function Meals() {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/api/meals', {
+      const response = await fetch(`${API_URL}/api/meals`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -58,7 +59,7 @@ function Meals() {
   const handleDelete = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/meals/${id}`, {
+      const response = await fetch(`${API_URL}/api/meals/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
