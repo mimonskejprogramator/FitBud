@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { exportMeals } from '../utils/exportCSV';
-import Loading from '../components/Loading';
+import { Skeleton } from "@/components/ui/skeleton";
 import EmptyState from '../components/EmptyState';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -83,7 +83,22 @@ function Meals() {
   };
 
   if (loading) {
-    return <Loading message="Načítám jídla..." />;
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto p-4 md:p-6 space-y-4">
+          <Skeleton className="h-10 w-48" />
+          {[1, 2, 3].map(i => (
+            <Card key={i}>
+              <CardHeader><Skeleton className="h-5 w-1/3" /></CardHeader>
+              <CardContent className="space-y-2">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-1/4" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (

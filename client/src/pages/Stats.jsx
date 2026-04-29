@@ -15,6 +15,7 @@ import { Bar, Line } from 'react-chartjs-2';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { exportAllData } from '../utils/exportCSV';
+import { Skeleton } from "@/components/ui/skeleton";
 import { API_URL } from "@/lib/api";
 
 // Registrace komponent Chart.js - bez toho to nefunguje
@@ -175,8 +176,22 @@ function Stats() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Načítám statistiky...</p>
+      <div className="min-h-screen bg-background">
+        <div className="max-w-5xl mx-auto p-6 space-y-4">
+          <Skeleton className="h-10 w-64" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[1, 2, 3].map(i => (
+              <Card key={i}>
+                <CardHeader className="pb-2"><Skeleton className="h-4 w-24" /></CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-20" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <Card><CardContent className="pt-6"><Skeleton className="h-64 w-full" /></CardContent></Card>
+          <Card><CardContent className="pt-6"><Skeleton className="h-64 w-full" /></CardContent></Card>
+        </div>
       </div>
     );
   }

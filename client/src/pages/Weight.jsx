@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
-import Loading from '../components/Loading';
+import { Skeleton } from "@/components/ui/skeleton";
 import EmptyState from '../components/EmptyState';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -80,7 +80,27 @@ function Weight() {
     }
   };
 
-  if (loading) return <Loading message="Načítám záznamy..." />;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto p-4 md:p-6 space-y-4">
+          <Skeleton className="h-10 w-48" />
+          <Card>
+            <CardHeader><Skeleton className="h-5 w-40" /></CardHeader>
+            <CardContent><Skeleton className="h-64 w-full" /></CardContent>
+          </Card>
+          {[1, 2, 3].map(i => (
+            <Card key={i}>
+              <CardContent className="pt-6 space-y-2">
+                <Skeleton className="h-4 w-1/3" />
+                <Skeleton className="h-4 w-1/4" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   // Data pro graf trendu - zobrazí všechny záznamy v pořadí podle data
   const chartData = {

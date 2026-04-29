@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Loading from '../components/Loading';
+import { Skeleton } from "@/components/ui/skeleton";
 import { Line, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -202,7 +202,34 @@ function Dashboard() {
   const waterPercent = Math.min(100, Math.round((waterToday / waterGoal) * 100));
 
   if (loading) {
-    return <Loading message="Načítám dashboard..." />;
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="max-w-7xl mx-auto p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {[1, 2, 3].map(i => (
+              <Card key={i}>
+                <CardHeader className="pb-2"><Skeleton className="h-4 w-24" /></CardHeader>
+                <CardContent>
+                  <Skeleton className="h-10 w-32 mb-3" />
+                  <Skeleton className="h-2 w-full" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          <Card className="mb-6">
+            <CardHeader className="pb-2"><Skeleton className="h-5 w-32" /></CardHeader>
+            <CardContent>
+              <Skeleton className="h-2 w-full mb-3" />
+              <Skeleton className="h-8 w-48" />
+            </CardContent>
+          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card><CardContent className="pt-6"><Skeleton className="h-64 w-full" /></CardContent></Card>
+            <Card><CardContent className="pt-6"><Skeleton className="h-64 w-full" /></CardContent></Card>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Konfigurace grafů
