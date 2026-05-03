@@ -8,10 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Scale, Trash2 } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import { API_URL } from "@/lib/api";
 
 function Weight() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -58,6 +60,7 @@ function Weight() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Chyba při ukládání');
+      toast({ title: "Váha přidána", description: "Záznam byl úspěšně uložen." });
       setWeight('');
       setNotes('');
       loadLogs();
@@ -74,6 +77,7 @@ function Weight() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Mazání selhalo');
+      toast({ title: "Záznam smazán" });
       setLogs(logs.filter(l => l.id !== id));
     } catch (err) {
       setError(err.message);

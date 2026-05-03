@@ -8,10 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Utensils, Plus, Download, Pencil, Trash2 } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import { API_URL } from "@/lib/api";
 
 function Meals() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -70,7 +72,7 @@ function Meals() {
         throw new Error('Nepodařilo se smazat jídlo');
       }
 
-      // Znovu načíst seznam
+      toast({ title: "Jídlo smazáno" });
       loadMeals();
     } catch (err) {
       setError(err.message);

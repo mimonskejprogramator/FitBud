@@ -8,10 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Moon, Plus, Download, Pencil, Trash2, Clock } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import { API_URL } from "@/lib/api";
 
 function Sleep() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [sleepRecords, setSleepRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -67,6 +69,7 @@ function Sleep() {
         throw new Error('Nepodařilo se smazat záznam');
       }
 
+      toast({ title: "Záznam smazán" });
       loadSleepRecords();
     } catch (err) {
       setError(err.message);

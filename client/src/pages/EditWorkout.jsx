@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Dumbbell } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import { API_URL } from "@/lib/api";
 
 function EditWorkout() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { id } = useParams();
   const [formData, setFormData] = useState({
     name: '',
@@ -92,6 +94,7 @@ function EditWorkout() {
         throw new Error(data.error || 'Nepodařilo se uložit změny');
       }
 
+      toast({ title: "Trénink upraven", description: "Změny byly úspěšně uloženy." });
       navigate('/workouts');
     } catch (err) {
       setError(err.message);

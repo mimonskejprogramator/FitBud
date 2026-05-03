@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Moon } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import { API_URL } from "@/lib/api";
 
 function EditSleep() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { id } = useParams();
   const [formData, setFormData] = useState({
     sleep_date: '',
@@ -109,6 +111,7 @@ function EditSleep() {
         throw new Error(data.error || 'Nepodařilo se uložit změny');
       }
 
+      toast({ title: "Spánek upraven", description: "Změny byly úspěšně uloženy." });
       navigate('/sleep');
     } catch (err) {
       setError(err.message);

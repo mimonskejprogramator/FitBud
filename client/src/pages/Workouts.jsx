@@ -8,10 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dumbbell, Plus, Download, Pencil, Trash2, Clock, Flame } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import { API_URL } from "@/lib/api";
 
 function Workouts() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -69,6 +71,7 @@ function Workouts() {
         throw new Error('Nepodařilo se smazat trénink');
       }
 
+      toast({ title: "Trénink smazán" });
       loadWorkouts();
     } catch (err) {
       setError(err.message);

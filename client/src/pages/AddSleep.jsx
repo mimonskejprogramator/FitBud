@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Moon } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import { API_URL } from "@/lib/api";
 
 function AddSleep() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     sleep_date: new Date().toISOString().split('T')[0],
     bedtime: '',
@@ -99,7 +101,7 @@ function AddSleep() {
         throw new Error(data.error || 'Nepodařilo se uložit záznam');
       }
 
-      // Přesměrování na seznam
+      toast({ title: "Spánek přidán", description: "Záznam byl úspěšně uložen." });
       navigate('/sleep');
     } catch (err) {
       setError(err.message);

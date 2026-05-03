@@ -6,10 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Utensils } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import { API_URL } from "@/lib/api";
 
 function EditMeal() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -108,7 +110,7 @@ function EditMeal() {
         throw new Error(data.error || 'Nepodařilo se upravit jídlo');
       }
 
-      // Přesměrování zpět na seznam
+      toast({ title: "Jídlo upraveno", description: "Změny byly úspěšně uloženy." });
       navigate('/meals');
     } catch (err) {
       setError(err.message);
