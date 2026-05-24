@@ -164,7 +164,7 @@ function AppNav({ user }) {
         </Button>
       </div>
 
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t px-4 py-2 flex justify-around z-20">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t px-2 py-2 flex gap-1 overflow-x-auto z-20 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -174,7 +174,7 @@ function AppNav({ user }) {
               variant={isActive ? "default" : "ghost"}
               size="sm"
               onClick={() => navigate(item.path)}
-              className="flex-col h-auto py-2 px-3"
+              className="flex-col h-auto py-2 px-3 shrink-0"
             >
               <Icon className="h-5 w-5" />
               <span className="text-xs mt-1">{item.label}</span>
