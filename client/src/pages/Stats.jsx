@@ -187,7 +187,7 @@ function Stats() {
 
   const handleExportAll = async () => {
     setExportMessage('');
-    const result = await exportAllData(token);
+    const result = await exportAllData();
     setExportMessage(result.message);
     setTimeout(() => setExportMessage(''), 5000);
   };

@@ -71,7 +71,7 @@ export const exportSleep = (sleepRecords) => {
   downloadCSV(csvContent, filename);
 };
 
-export const exportAllData = async (token) => {
+export const exportAllData = async () => {
   try {
 
     const [mealsRes, workoutsRes, sleepRes] = await Promise.all([

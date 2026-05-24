@@ -84,14 +84,14 @@ function Register() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Minimálně 6 znaků"
+                placeholder="Minimálně 8 znaků"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
               />
               <p className="text-xs text-muted-foreground">
-                Heslo musí mít alespoň 6 znaků
+                Heslo musí mít alespoň 8 znaků
               </p>
             </div>
 

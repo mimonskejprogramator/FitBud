@@ -1,6 +1,8 @@
 import pg from 'pg';
 
-const { Pool } = pg;
+const { Pool, types } = pg;
+
+types.setTypeParser(1082, (value) => value);
 
 let pool = null;
 
