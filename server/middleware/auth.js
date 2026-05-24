@@ -17,7 +17,7 @@ if (JWT_SECRET.length < 32) {
 export const cookieOptions = {
   httpOnly: true,
   secure: IS_PROD,
-  sameSite: IS_PROD ? 'strict' : 'lax',
+  sameSite: 'lax',
   maxAge: 7 * 24 * 60 * 60 * 1000,
   path: '/'
 };
