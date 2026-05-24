@@ -49,7 +49,7 @@ function App() {
 
         <Route path="/weight" element={<Weight />} />
 
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Layout>
       <Toaster />
