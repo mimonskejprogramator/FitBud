@@ -1,0 +1,71 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: fitbud-db
+    environment:
+      POSTGRES_USER: ${PGUSER:?PGUSER chybi v .env}
+      POSTGRES_PASSWORD: ${PGPASSWORD:?PGPASSWORD chybi v .env}
+      POSTGRES_DB: ${PGDATABASE:?PGDATABASE chybi v .env}
+    volumes:
+      - fitbud-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER} -d ${PGDATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - internal
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.prod
+    container_name: fitbud-server
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: ${PGUSER}
+      PGPASSWORD: ${PGPASSWORD}
+      PGDATABASE: ${PGDATABASE}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET chybi v .env}
+      CORS_ORIGIN: https://${DOMAIN:?DOMAIN chybi v .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - internal
+
+  caddy:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: ""
+    container_name: fitbud-caddy
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - server
+    restart: unless-stopped
+    networks:
+      - internal
+
+volumes:
+  fitbud-pgdata:
+  caddy-data:
+  caddy-config:
+
+networks:
+  internal:
+    driver: bridge
