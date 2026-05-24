@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Moon } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { API_URL } from "@/lib/api";
+import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api';
 
 function AddSleep() {
   const navigate = useNavigate();
@@ -32,20 +32,18 @@ function AddSleep() {
     }));
   };
 
-  // Automatický výpočet délky spánku
   const calculateDuration = () => {
     if (formData.bedtime && formData.wake_time) {
       const bedtime = new Date(`2000-01-01 ${formData.bedtime}`);
       let wakeTime = new Date(`2000-01-01 ${formData.wake_time}`);
-      
-      // Pokud je čas probuzení menší než čas usnutí, přičti den
+
       if (wakeTime < bedtime) {
         wakeTime = new Date(`2000-01-02 ${formData.wake_time}`);
       }
-      
+
       const diff = wakeTime - bedtime;
       const hours = (diff / (1000 * 60 * 60)).toFixed(1);
-      
+
       setFormData(prev => ({
         ...prev,
         duration_hours: hours
@@ -57,7 +55,6 @@ function AddSleep() {
     e.preventDefault();
     setError('');
 
-    // Validace vstupů před odesláním
     if (!formData.sleep_date) {
       setError('Vyber datum spánku');
       return;
@@ -74,23 +71,16 @@ function AddSleep() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
-      // Převod duration_hours na číslo
       const dataToSend = {
         ...formData,
         duration_hours: parseFloat(formData.duration_hours)
       };
 
       const response = await fetch(`${API_URL}/api/sleep`, {
+        credentials: 'include',
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(dataToSend)
       });
@@ -113,7 +103,7 @@ function AddSleep() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 max-w-2xl">
-        {/* Header */}
+
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
@@ -127,7 +117,6 @@ function AddSleep() {
           </Button>
         </div>
 
-        {/* Formulář */}
         <Card>
           <CardHeader>
             <CardTitle>Nový záznam spánku</CardTitle>
@@ -244,4 +233,3 @@ function AddSleep() {
 }
 
 export default AddSleep;
-

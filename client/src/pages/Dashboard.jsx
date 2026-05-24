@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Line, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -13,10 +13,10 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { API_URL } from "@/lib/api";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { API_URL, fetchCurrentUser, logoutRequest } from '@/lib/api';
 
 ChartJS.register(
   CategoryScale,
@@ -36,7 +36,7 @@ function Dashboard() {
     const stored = localStorage.getItem('calorieGoal');
     return stored ? parseInt(stored) : 2000;
   });
-  const [waterGoal] = useState(() => {
+  const [waterGoal, setWaterGoal] = useState(() => {
     const stored = localStorage.getItem('waterGoal');
     return stored ? parseInt(stored) : 2500;
   });
@@ -53,67 +53,58 @@ function Dashboard() {
     sleep: { labels: [], data: [] }
   });
   const navigate = useNavigate();
+  const location = useLocation();
+  const justRegistered = location.state?.justRegistered;
 
   useEffect(() => {
-    // Kontrola, zda je uživatel přihlášený
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      // Pokud není token, přesměruj na login
-      navigate('/login');
-      return;
-    }
-
-    // Dekódování tokenu pro získání info o uživateli
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      setUser(payload);
-      loadTodayStats(token);
-    } catch (err) {
-      console.error('Chyba při dekódování tokenu:', err);
-      localStorage.removeItem('token');
-      navigate('/login');
-    }
+    let cancelled = false;
+    (async () => {
+      const u = await fetchCurrentUser();
+      if (cancelled) return;
+      if (!u) {
+        navigate('/login');
+        return;
+      }
+      setUser(u);
+      loadTodayStats();
+    })();
+    return () => { cancelled = true; };
   }, [navigate]);
 
-  // Načtení dnešních dat ze serveru
-  const loadTodayStats = async (token) => {
-    try {
-      const today = new Date().toISOString().split('T')[0]; // formát YYYY-MM-DD
+  useEffect(() => {
+    const syncGoals = () => {
+      const cal = localStorage.getItem('calorieGoal');
+      if (cal) setCalorieGoal(parseInt(cal));
+      const water = localStorage.getItem('waterGoal');
+      if (water) setWaterGoal(parseInt(water));
+    };
+    window.addEventListener('settings-updated', syncGoals);
+    return () => window.removeEventListener('settings-updated', syncGoals);
+  }, []);
 
-      // Načtení jídel z API
-      const mealsRes = await fetch(`${API_URL}/api/meals`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+  const loadTodayStats = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+
+      const mealsRes = await fetch(`${API_URL}/api/meals`, { credentials: 'include' });
       const mealsData = await mealsRes.json();
       const todayMeals = mealsData.meals.filter(m => m.meal_date === today);
 
-      // Sečtení kalorií - reduce je fakt užitečný
       const totalCaloriesIn = todayMeals.reduce((sum, m) => sum + m.calories, 0);
 
-      // Tréninky
-      const workoutsRes = await fetch(`${API_URL}/api/workouts`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const workoutsRes = await fetch(`${API_URL}/api/workouts`, { credentials: 'include' });
       const workoutsData = await workoutsRes.json();
       const todayWorkouts = workoutsData.workouts.filter(w => w.workout_date === today);
       const totalCaloriesOut = todayWorkouts.reduce((sum, w) => sum + (w.calories_burned || 0), 0);
 
-      // Spánek - tady používám find místo filter, protože je jen jeden záznam za den
-      const sleepRes = await fetch(`${API_URL}/api/sleep`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const sleepRes = await fetch(`${API_URL}/api/sleep`, { credentials: 'include' });
       const sleepData = await sleepRes.json();
       const todaySleep = sleepData.sleep.find(s => s.sleep_date === today);
 
-      // Pitný režim - dnešní součet z API
-      const waterRes = await fetch(`${API_URL}/api/water/today`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const waterRes = await fetch(`${API_URL}/api/water/today`, { credentials: 'include' });
       const waterData = await waterRes.json();
-      setWaterToday(waterData.total || 0);
+      setWaterToday(Number(waterData.total) || 0);
 
-      // Příprava dat pro grafy - posledních 7 dní
       const last7Days = [];
       for (let i = 6; i >= 0; i--) {
         const date = new Date();
@@ -121,13 +112,11 @@ function Dashboard() {
         last7Days.push(date.toISOString().split('T')[0]);
       }
 
-      // Kalorie po dnech
       const caloriesByDay = last7Days.map(date => {
         const dayMeals = mealsData.meals.filter(m => m.meal_date === date);
         return dayMeals.reduce((sum, m) => sum + m.calories, 0);
       });
 
-      // Spánek po dnech
       const sleepByDay = last7Days.map(date => {
         const daySleep = sleepData.sleep.find(s => s.sleep_date === date);
         return daySleep ? daySleep.duration_hours : 0;
@@ -159,12 +148,11 @@ function Dashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
+  const handleLogout = async () => {
+    await logoutRequest();
     navigate('/login');
   };
 
-  // Změna denního cíle kalorií - jednoduchý prompt, hodnota se uloží do localStorage
   const handleChangeGoal = () => {
     const input = prompt('Denní cíl kalorií (kcal):', calorieGoal);
     if (input === null) return;
@@ -175,24 +163,21 @@ function Dashboard() {
     }
   };
 
-  // Procento splnění cíle, ořezané na 0-100 pro šířku progress baru
   const caloriePercent = Math.min(100, Math.round((stats.totalCaloriesIn / calorieGoal) * 100));
   const isOverGoal = stats.totalCaloriesIn > calorieGoal;
 
-  // Přidání vody - rychlé tlačítko pošle POST a aktualizuje stav
   const handleAddWater = async (amount) => {
-    const token = localStorage.getItem('token');
     try {
       const res = await fetch(`${API_URL}/api/water`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ amount_ml: amount })
       });
       if (res.ok) {
-        setWaterToday(prev => prev + amount);
+        setWaterToday(prev => Number(prev) + Number(amount));
       }
     } catch (err) {
       console.error('Chyba při ukládání vody:', err);
@@ -232,7 +217,6 @@ function Dashboard() {
     );
   }
 
-  // Konfigurace grafů
   const caloriesChartData = {
     labels: chartData.calories.labels,
     datasets: [{
@@ -281,11 +265,20 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hlavní obsah */}
+
       <div className="max-w-7xl mx-auto p-6">
-        {/* Statistiky - 3 karty */}
+
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-foreground">
+            {justRegistered ? 'Vítej' : 'Vítej zpět'}{user?.name ? `, ${user.name}` : ''}!
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {justRegistered ? 'Pojď si nastavit svůj první den' : 'Tady je tvůj dnešní přehled'}
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {/* Karta - Jídla */}
+
           <Card>
             <CardHeader className="pb-2">
               <CardDescription>Příjem kalorií</CardDescription>
@@ -317,7 +310,6 @@ function Dashboard() {
                 </HoverCardContent>
               </HoverCard>
 
-              {/* Progress bar denního cíle */}
               <div className="mt-3 h-2 w-full bg-muted rounded-full overflow-hidden">
                 <div
                   className={`h-full transition-all ${isOverGoal ? 'bg-destructive' : 'bg-primary'}`}
@@ -339,7 +331,6 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Karta - Tréninky */}
           <Card>
             <CardHeader className="pb-2">
               <CardDescription>Spálené kalorie</CardDescription>
@@ -354,7 +345,6 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Karta - Spánek */}
           <Card>
             <CardHeader className="pb-2">
               <CardDescription>Spánek</CardDescription>
@@ -383,7 +373,6 @@ function Dashboard() {
           </Card>
         </div>
 
-        {/* Pitný režim */}
         <Card className="mb-6">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Pitný režim</CardTitle>
@@ -410,9 +399,8 @@ function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Grafy */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-          {/* Graf kalorií */}
+
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Kalorický příjem (7 dní)</CardTitle>
@@ -424,7 +412,6 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Graf spánku */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Délka spánku (7 dní)</CardTitle>
@@ -437,7 +424,6 @@ function Dashboard() {
           </Card>
         </div>
 
-        {/* Rychlé akce */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Rychlé akce</CardTitle>
@@ -473,4 +459,3 @@ function Dashboard() {
 }
 
 export default Dashboard;
-

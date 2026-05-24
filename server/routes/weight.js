@@ -6,10 +6,6 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
-/**
- * GET /api/weight
- * Všechny záznamy váhy uživatele seřazené chronologicky
- */
 router.get('/', async (req, res) => {
   try {
     const db = getDatabase();
@@ -24,10 +20,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-/**
- * POST /api/weight
- * Nový záznam váhy
- */
 router.post('/', async (req, res) => {
   try {
     const { weight_kg, log_date, notes } = req.body;
@@ -55,9 +47,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-/**
- * DELETE /api/weight/:id
- */
 router.delete('/:id', async (req, res) => {
   try {
     const db = getDatabase();
@@ -76,4 +65,3 @@ router.delete('/:id', async (req, res) => {
 });
 
 export default router;
-

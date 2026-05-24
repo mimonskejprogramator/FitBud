@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Dumbbell } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { API_URL } from "@/lib/api";
+import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api';
 
 function EditWorkout() {
   const navigate = useNavigate();
@@ -33,15 +33,9 @@ function EditWorkout() {
 
   const loadWorkout = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
       const response = await fetch(`${API_URL}/api/workouts/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+        credentials: 'include',
+              });
 
       const data = await response.json();
 
@@ -49,7 +43,6 @@ function EditWorkout() {
         throw new Error(data.error || 'Nepodařilo se načíst trénink');
       }
 
-      // Naplnění formuláře existujícími daty
       const w = data.workout;
       setFormData({
         name: w.name || '',
@@ -78,12 +71,11 @@ function EditWorkout() {
     setSaving(true);
 
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/workouts/${id}`, {
+        credentials: 'include',
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
       });
@@ -250,4 +242,3 @@ function EditWorkout() {
 }
 
 export default EditWorkout;
-

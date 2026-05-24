@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { exportSleep } from '../utils/exportCSV';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/ui/skeleton';
 import EmptyState from '../components/EmptyState';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Moon, Plus, Download, Pencil, Trash2, Clock } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { API_URL } from "@/lib/api";
+import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api';
 
 function Sleep() {
   const navigate = useNavigate();
@@ -24,17 +24,9 @@ function Sleep() {
 
   const loadSleepRecords = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
       const response = await fetch(`${API_URL}/api/sleep`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+        credentials: 'include',
+              });
 
       const data = await response.json();
 
@@ -42,7 +34,6 @@ function Sleep() {
         throw new Error(data.error || 'Nepodařilo se načíst záznamy');
       }
 
-      // Seřazení podle data (nejnovější první)
       const sortedRecords = data.sleep.sort((a, b) => {
         return new Date(b.sleep_date) - new Date(a.sleep_date);
       });
@@ -57,13 +48,10 @@ function Sleep() {
 
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/sleep/${id}`, {
+        credentials: 'include',
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+              });
 
       if (!response.ok) {
         throw new Error('Nepodařilo se smazat záznam');
@@ -81,7 +69,6 @@ function Sleep() {
     return date.toLocaleDateString('cs-CZ');
   };
 
-  // Překlad kvality spánku
   const getQualityLabel = (quality) => {
     const qualities = {
       'excellent': 'Výborná',
@@ -92,7 +79,6 @@ function Sleep() {
     return qualities[quality] || quality;
   };
 
-  // Barva podle kvality
   const getQualityColor = (quality) => {
     const colors = {
       'excellent': '#28a745',
@@ -125,7 +111,7 @@ function Sleep() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 space-y-6">
-        {/* Header */}
+
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
@@ -170,7 +156,7 @@ function Sleep() {
           />
         ) : (
           <>
-            {/* Statistiky */}
+
             <Card>
               <CardHeader>
                 <CardTitle>Statistiky za posledních 7 dní</CardTitle>
@@ -191,7 +177,6 @@ function Sleep() {
               </CardContent>
             </Card>
 
-            {/* Seznam záznamů */}
             <ScrollArea className="h-[calc(100vh-400px)]">
               <div className="space-y-4">
               {sleepRecords.map(record => (

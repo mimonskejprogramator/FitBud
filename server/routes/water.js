@@ -6,10 +6,6 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
-/**
- * GET /api/water
- * Vrátí všechny záznamy o pití pro uživatele
- */
 router.get('/', async (req, res) => {
   try {
     const db = getDatabase();
@@ -24,10 +20,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-/**
- * GET /api/water/today
- * Součet vypité vody za dnešní den
- */
 router.get('/today', async (req, res) => {
   try {
     const db = getDatabase();
@@ -36,17 +28,13 @@ router.get('/today', async (req, res) => {
       'SELECT COALESCE(SUM(amount_ml), 0) AS total FROM water_logs WHERE user_id = ? AND log_date = ?',
       [req.user.id, today]
     );
-    res.json({ total: row.total, date: today });
+    res.json({ total: parseInt(row.total, 10) || 0, date: today });
   } catch (error) {
     console.error('Chyba při načítání denního součtu:', error);
     res.status(500).json({ error: 'Nepodařilo se načíst denní součet' });
   }
 });
 
-/**
- * POST /api/water
- * Přidání záznamu (množství v ml)
- */
 router.post('/', async (req, res) => {
   try {
     const { amount_ml, log_date } = req.body;
@@ -74,10 +62,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-/**
- * DELETE /api/water/:id
- * Smazání záznamu
- */
 router.delete('/:id', async (req, res) => {
   try {
     const db = getDatabase();
@@ -96,4 +80,3 @@ router.delete('/:id', async (req, res) => {
 });
 
 export default router;
-

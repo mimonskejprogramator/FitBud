@@ -1,17 +1,19 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Settings, Home, Utensils, Dumbbell, Moon, BarChart3, Scale, Sun } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from '@/hooks/use-toast';
+import { logoutRequest } from '@/lib/api';
 
 function AppNav({ user }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   const [calorieGoal, setCalorieGoal] = useState(2000);
+  const [waterGoal, setWaterGoal] = useState(2500);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
 
@@ -27,24 +29,30 @@ function AppNav({ user }) {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
+  const handleLogout = async () => {
+    await logoutRequest();
     navigate('/login');
   };
 
   const handleSaveSettings = () => {
     localStorage.setItem('calorieGoal', calorieGoal);
+    localStorage.setItem('waterGoal', waterGoal);
+    window.dispatchEvent(new Event('settings-updated'));
     toast({
       title: "Nastavení uloženo",
-      description: `Cílový příjem kalorií: ${calorieGoal} kcal`,
+      description: `Kalorie: ${calorieGoal} kcal · Voda: ${waterGoal} ml`,
     });
     setIsSettingsOpen(false);
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem('calorieGoal');
-    if (saved) {
-      setCalorieGoal(parseInt(saved));
+    const savedCal = localStorage.getItem('calorieGoal');
+    if (savedCal) {
+      setCalorieGoal(parseInt(savedCal));
+    }
+    const savedWater = localStorage.getItem('waterGoal');
+    if (savedWater) {
+      setWaterGoal(parseInt(savedWater));
     }
   }, []);
 
@@ -91,7 +99,7 @@ function AppNav({ user }) {
         <span className="text-sm text-muted-foreground hidden sm:inline">
           {user?.name || user?.email}
         </span>
-        
+
         <Button
           variant="outline"
           size="sm"
@@ -128,6 +136,18 @@ function AppNav({ user }) {
                   Doporučený příjem pro udržení váhy
                 </p>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="waterGoal">Cílový denní příjem vody (ml)</Label>
+                <Input
+                  id="waterGoal"
+                  type="number"
+                  value={waterGoal}
+                  onChange={(e) => setWaterGoal(parseInt(e.target.value))}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Doporučeno 2000–3000 ml denně
+                </p>
+              </div>
               <Button onClick={handleSaveSettings} className="w-full">
                 Uložit nastavení
               </Button>
@@ -144,7 +164,6 @@ function AppNav({ user }) {
         </Button>
       </div>
 
-      {/* Mobile Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t px-4 py-2 flex justify-around z-20">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -168,4 +187,3 @@ function AppNav({ user }) {
 }
 
 export default AppNav;
-

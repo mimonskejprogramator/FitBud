@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { API_URL } from "@/lib/api";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { API_URL } from '@/lib/api';
 
 function Register() {
   const [name, setName] = useState('');
@@ -20,9 +20,10 @@ function Register() {
     setLoading(true);
 
     try {
-      // Registrace nového uživatele
+
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -35,11 +36,7 @@ function Register() {
         throw new Error(data.error || 'Registrace selhala');
       }
 
-      // Po registraci se automaticky přihlásí (dostanu token)
-      localStorage.setItem('token', data.token);
-
-      // Redirect
-      navigate('/dashboard');
+      navigate('/dashboard', { state: { justRegistered: true } });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -126,4 +123,3 @@ function Register() {
 }
 
 export default Register;
-

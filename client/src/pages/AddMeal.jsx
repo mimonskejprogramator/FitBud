@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Utensils } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { API_URL } from "@/lib/api";
+import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api';
 
 function AddMeal() {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ function AddMeal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Formulářová data
   const [formData, setFormData] = useState({
     name: '',
     calories: '',
@@ -38,7 +37,6 @@ function AddMeal() {
     e.preventDefault();
     setError('');
 
-    // Validace - kontrola povinných polí
     if (!formData.name.trim()) {
       setError('Zadej název jídla');
       return;
@@ -51,7 +49,7 @@ function AddMeal() {
       setError('Vyber datum');
       return;
     }
-    // Kontrola makroživin - nesmí být záporné
+
     if (formData.protein && parseInt(formData.protein) < 0) {
       setError('Bílkoviny nesmí být záporné číslo');
       return;
@@ -68,17 +66,11 @@ function AddMeal() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
       const response = await fetch(`${API_URL}/api/meals`, {
+        credentials: 'include',
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           ...formData,
@@ -107,7 +99,7 @@ function AddMeal() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 max-w-2xl">
-        {/* Header */}
+
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
@@ -121,7 +113,6 @@ function AddMeal() {
           </Button>
         </div>
 
-        {/* Formulář */}
         <Card>
           <CardHeader>
             <CardTitle>Nové jídlo</CardTitle>
@@ -163,7 +154,6 @@ function AddMeal() {
                 />
               </div>
 
-              {/* Makroživiny - nepovinné */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="protein">Bílkoviny (g)</Label>
@@ -254,4 +244,3 @@ function AddMeal() {
 }
 
 export default AddMeal;
-

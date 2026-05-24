@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Dumbbell } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { API_URL } from "@/lib/api";
+import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api';
 
 function AddWorkout() {
   const navigate = useNavigate();
@@ -37,7 +37,6 @@ function AddWorkout() {
     e.preventDefault();
     setError('');
 
-    // Validace vstupů
     if (!formData.name.trim()) {
       setError('Zadej název tréninku');
       return;
@@ -62,17 +61,11 @@ function AddWorkout() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
       const response = await fetch(`${API_URL}/api/workouts`, {
+        credentials: 'include',
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           ...formData,
@@ -99,7 +92,7 @@ function AddWorkout() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 max-w-2xl">
-        {/* Header */}
+
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
@@ -113,7 +106,6 @@ function AddWorkout() {
           </Button>
         </div>
 
-        {/* Formulář */}
         <Card>
           <CardHeader>
             <CardTitle>Nový trénink</CardTitle>
@@ -240,4 +232,3 @@ function AddWorkout() {
 }
 
 export default AddWorkout;
-

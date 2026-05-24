@@ -1,42 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AppNav from './AppNav';
+import { fetchCurrentUser } from '@/lib/api';
 
-/**
- * Layout komponenta pro autentizované stránky
- * Zobrazuje AppNav a obaluje obsah stránky
- */
 function Layout({ children }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    // Ověření tokenu a načtení uživatele
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    // Dekódování tokenu pro získání uživatelských dat
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      setUser(payload);
-    } catch (err) {
-      console.error('Chyba při dekódování tokenu:', err);
-      navigate('/login');
-    }
-  }, [navigate]);
-
-  // Skrýt layout na login a register stránkách
   const hideOn = ['/login', '/register'];
-  if (hideOn.includes(location.pathname)) {
+  const isPublic = hideOn.includes(location.pathname);
+
+  useEffect(() => {
+    if (isPublic) return;
+
+    let cancelled = false;
+    (async () => {
+      const u = await fetchCurrentUser();
+      if (cancelled) return;
+      if (!u) {
+        navigate('/login');
+        return;
+      }
+      setUser(u);
+    })();
+    return () => { cancelled = true; };
+  }, [navigate, isPublic, location.pathname]);
+
+  if (isPublic) {
     return <>{children}</>;
   }
 
   if (!user) {
-    return null; // Nebo loading spinner
+    return null;
   }
 
   return (
@@ -50,4 +46,3 @@ function Layout({ children }) {
 }
 
 export default Layout;
-

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Utensils } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { API_URL } from "@/lib/api";
+import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api';
 
 function EditMeal() {
   const navigate = useNavigate();
@@ -34,17 +34,9 @@ function EditMeal() {
 
   const loadMeal = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
       const response = await fetch(`${API_URL}/api/meals/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+        credentials: 'include',
+              });
 
       const data = await response.json();
 
@@ -52,7 +44,6 @@ function EditMeal() {
         throw new Error(data.error || 'Nepodařilo se načíst jídlo');
       }
 
-      // Naplnění formuláře
       setFormData({
         name: data.meal.name,
         calories: data.meal.calories,
@@ -83,17 +74,11 @@ function EditMeal() {
     setSaving(true);
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
       const response = await fetch(`${API_URL}/api/meals/${id}`, {
+        credentials: 'include',
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           ...formData,
@@ -182,7 +167,6 @@ function EditMeal() {
                 />
               </div>
 
-              {/* Makroživiny - nepovinné */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="protein">Bílkoviny (g)</Label>

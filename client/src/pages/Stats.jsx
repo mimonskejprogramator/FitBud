@@ -12,13 +12,12 @@ import {
   Legend
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { exportAllData } from '../utils/exportCSV';
-import { Skeleton } from "@/components/ui/skeleton";
-import { API_URL } from "@/lib/api";
+import { Skeleton } from '@/components/ui/skeleton';
+import { API_URL } from '@/lib/api';
 
-// Registrace komponent Chart.js - bez toho to nefunguje
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -44,7 +43,6 @@ function Stats() {
     loadAllData();
   }, []);
 
-  // Sledování změny tématu kvůli barvám v grafech
   useEffect(() => {
     const observer = new MutationObserver(() => {
       setIsDark(document.documentElement.classList.contains('dark'));
@@ -55,17 +53,13 @@ function Stats() {
 
   const loadAllData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
-      // Načtení všech dat najednou
       const [mealsRes, workoutsRes, sleepRes] = await Promise.all([
-        fetch(`${API_URL}/api/meals`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${API_URL}/api/workouts`, { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch(`${API_URL}/api/sleep`, { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch(`${API_URL}/api/meals`, {
+        credentials: 'include', headers: { } }),
+        fetch(`${API_URL}/api/workouts`, {
+        credentials: 'include', headers: { } }),
+        fetch(`${API_URL}/api/sleep`, {
+        credentials: 'include', headers: { } })
       ]);
 
       const mealsData = await mealsRes.json();
@@ -82,7 +76,6 @@ function Stats() {
     }
   };
 
-  // Pomocná funkce - posledních N dní
   const getLast7Days = () => {
     const days = [];
     for (let i = 6; i >= 0; i--) {
@@ -95,12 +88,10 @@ function Stats() {
 
   const last7Days = getLast7Days();
 
-  // Labely pro grafy (Po, Út, St...)
   const dayLabels = last7Days.map(d => {
     return new Date(d).toLocaleDateString('cs-CZ', { weekday: 'short', day: 'numeric' });
   });
 
-  // Data pro graf kalorií (příjem vs výdej)
   const caloriesInData = last7Days.map(day => {
     return meals
       .filter(m => m.meal_date === day)
@@ -113,13 +104,11 @@ function Stats() {
       .reduce((sum, w) => sum + (w.calories_burned || 0), 0);
   });
 
-  // Data pro graf spánku
   const sleepData = last7Days.map(day => {
     const record = sleepRecords.find(s => s.sleep_date === day);
     return record ? parseFloat(record.duration_hours) : 0;
   });
 
-  // Celkové statistiky
   const totalCaloriesIn = meals.reduce((sum, m) => sum + (m.calories || 0), 0);
   const totalCaloriesOut = workouts.reduce((sum, w) => sum + (w.calories_burned || 0), 0);
   const avgSleep = sleepRecords.length > 0
@@ -198,7 +187,6 @@ function Stats() {
 
   const handleExportAll = async () => {
     setExportMessage('');
-    const token = localStorage.getItem('token');
     const result = await exportAllData(token);
     setExportMessage(result.message);
     setTimeout(() => setExportMessage(''), 5000);
@@ -232,7 +220,6 @@ function Stats() {
           </Card>
         )}
 
-        {/* Souhrnné karty */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <Card>
             <CardHeader className="pb-2">
@@ -263,7 +250,6 @@ function Stats() {
           </Card>
         </div>
 
-        {/* Graf kalorií */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-base">Kalorie za posledních 7 dní</CardTitle>
@@ -273,7 +259,6 @@ function Stats() {
           </CardContent>
         </Card>
 
-        {/* Graf spánku */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-base">Délka spánku za posledních 7 dní</CardTitle>
@@ -289,7 +274,6 @@ function Stats() {
           </CardContent>
         </Card>
 
-        {/* Přehled aktivit */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader>
@@ -338,4 +322,3 @@ function Stats() {
 }
 
 export default Stats;
-

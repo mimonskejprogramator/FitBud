@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { API_URL } from "@/lib/api";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { API_URL } from '@/lib/api';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -13,7 +13,6 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Funkce pro odeslání formuláře
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -22,6 +21,7 @@ function Login() {
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -34,10 +34,6 @@ function Login() {
         throw new Error(data.error || 'Přihlášení selhalo');
       }
 
-      // Uložení tokenu - funguje dobře
-      localStorage.setItem('token', data.token);
-
-      // Redirect na dashboard
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
@@ -109,4 +105,3 @@ function Login() {
 }
 
 export default Login;
-

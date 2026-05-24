@@ -1,13 +1,7 @@
 import bcrypt from 'bcrypt';
 
-// Počet salt rounds pro bcrypt (10 je dobrý kompromis mezi bezpečností a rychlostí)
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '12');
 
-/**
- * Hashuje heslo pomocí bcrypt
- * @param {string} password - Heslo v plain textu
- * @returns {Promise<string>} - Hashované heslo
- */
 export async function hashPassword(password) {
   try {
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -18,12 +12,6 @@ export async function hashPassword(password) {
   }
 }
 
-/**
- * Porovná heslo s hashem
- * @param {string} password - Heslo v plain textu
- * @param {string} hash - Hashované heslo z databáze
- * @returns {Promise<boolean>} - True pokud se hesla shodují
- */
 export async function comparePassword(password, hash) {
   try {
     const match = await bcrypt.compare(password, hash);
@@ -33,4 +21,3 @@ export async function comparePassword(password, hash) {
     throw new Error('Nepodařilo se ověřit heslo');
   }
 }
-

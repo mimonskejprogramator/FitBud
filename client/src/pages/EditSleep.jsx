@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Moon } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { API_URL } from "@/lib/api";
+import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api';
 
 function EditSleep() {
   const navigate = useNavigate();
@@ -32,15 +32,9 @@ function EditSleep() {
 
   const loadRecord = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
       const response = await fetch(`${API_URL}/api/sleep/${id}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+        credentials: 'include',
+              });
 
       const data = await response.json();
 
@@ -69,7 +63,6 @@ function EditSleep() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Automatický výpočet délky spánku
   const calculateDuration = () => {
     if (formData.bedtime && formData.wake_time) {
       const bedtime = new Date(`2000-01-01 ${formData.bedtime}`);
@@ -88,19 +81,16 @@ function EditSleep() {
     setSaving(true);
 
     try {
-      const token = localStorage.getItem('token');
-
-      // Převod duration_hours na číslo
       const dataToSend = {
         ...formData,
         duration_hours: parseFloat(formData.duration_hours)
       };
 
       const response = await fetch(`${API_URL}/api/sleep/${id}`, {
+        credentials: 'include',
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(dataToSend)
       });
@@ -257,4 +247,3 @@ function EditSleep() {
 }
 
 export default EditSleep;
-

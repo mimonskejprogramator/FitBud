@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
-// Komponenta pro prázdný stav - zobrazuje se když nejsou žádná data
 function EmptyState({ title, message, actionText, onAction }) {
   return (
     <div className="text-center py-16 px-5 bg-card text-card-foreground rounded-lg border shadow-sm">
@@ -14,4 +13,3 @@ function EmptyState({ title, message, actionText, onAction }) {
 }
 
 export default EmptyState;
-

@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { exportMeals } from '../utils/exportCSV';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/ui/skeleton';
 import EmptyState from '../components/EmptyState';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Utensils, Plus, Download, Pencil, Trash2 } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { API_URL } from "@/lib/api";
+import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api';
 
 function Meals() {
   const navigate = useNavigate();
@@ -24,17 +24,9 @@ function Meals() {
 
   const loadMeals = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
       const response = await fetch(`${API_URL}/api/meals`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+        credentials: 'include',
+              });
 
       const data = await response.json();
 
@@ -42,7 +34,6 @@ function Meals() {
         throw new Error(data.error || 'Nepodařilo se načíst jídla');
       }
 
-      // Seřazení podle data (nejnovější první)
       const sortedMeals = data.meals.sort((a, b) => {
         const dateA = new Date(a.meal_date + ' ' + (a.meal_time || '00:00'));
         const dateB = new Date(b.meal_date + ' ' + (b.meal_time || '00:00'));
@@ -57,16 +48,12 @@ function Meals() {
     }
   };
 
-  // Funkce pro smazání jídla
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/meals/${id}`, {
+        credentials: 'include',
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+              });
 
       if (!response.ok) {
         throw new Error('Nepodařilo se smazat jídlo');
@@ -106,7 +93,7 @@ function Meals() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 space-y-6">
-        {/* Header */}
+
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
@@ -142,7 +129,6 @@ function Meals() {
           </Card>
         )}
 
-        {/* Seznam jídel */}
         {meals.length === 0 ? (
           <EmptyState
             title="Zatím žádná jídla"

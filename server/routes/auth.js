@@ -2,11 +2,20 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import { getDatabase } from '../database.js';
 import { hashPassword, comparePassword } from '../utils/password.js';
-import { generateToken } from '../middleware/auth.js';
+import {
+  generateToken,
+  authenticateToken,
+  cookieOptions,
+  COOKIE_TOKEN_NAME
+} from '../middleware/auth.js';
+import {
+  isValidEmail,
+  isValidPassword,
+  isValidName
+} from '../utils/validation.js';
 
 const router = express.Router();
 
-// Omezení pokusů o přihlášení - max 5 za 15 minut z jedné IP
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -15,66 +24,70 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-/**
- * POST /api/auth/register
- * Registrace nového uživatele
- */
-router.post('/register', async (req, res) => {
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: { error: 'Příliš mnoho pokusů o registraci. Zkus to za hodinu.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+function setAuthCookie(res, token) {
+  res.cookie(COOKIE_TOKEN_NAME, token, cookieOptions);
+}
+
+router.post('/register', registerLimiter, async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name } = req.body || {};
 
-    // Validace vstupů
-    if (!email || !password || !name) {
-      return res.status(400).json({ 
-        error: 'Email, heslo a jméno jsou povinné' 
-      });
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ error: 'Neplatný email' });
+    }
+    if (!isValidPassword(password)) {
+      return res.status(400).json({ error: 'Heslo musí mít 8–128 znaků' });
+    }
+    if (!isValidName(name)) {
+      return res.status(400).json({ error: 'Jméno musí mít 1–80 znaků' });
     }
 
-    // Kontrola délky hesla
-    if (password.length < 6) {
-      return res.status(400).json({ 
-        error: 'Heslo musí mít alespoň 6 znaků' 
-      });
-    }
+    const normalizedEmail = email.trim().toLowerCase();
+    const trimmedName = name.trim();
 
     const db = getDatabase();
 
-    // Kontrola, jestli email už neexistuje
     const existingUser = await db.get(
       'SELECT id FROM users WHERE email = ?',
-      [email]
+      [normalizedEmail]
     );
 
     if (existingUser) {
-      return res.status(409).json({ 
-        error: 'Uživatel s tímto emailem už existuje' 
+      return res.status(409).json({
+        error: 'Uživatel s tímto emailem už existuje'
       });
     }
 
-    // Hashování hesla
     const passwordHash = await hashPassword(password);
 
-    // Vytvoření nového uživatele
     const result = await db.run(
       'INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)',
-      [email, passwordHash, name]
+      [normalizedEmail, passwordHash, trimmedName]
     );
 
-    // Vygenerování JWT tokenu
-    const token = generateToken({ 
-      id: result.lastID, 
-      email 
+    const token = generateToken({
+      id: result.lastID,
+      email: normalizedEmail,
+      name: trimmedName
     });
 
-    // Vrácení odpovědi
+    setAuthCookie(res, token);
+
     res.status(201).json({
       message: 'Registrace úspěšná',
       user: {
         id: result.lastID,
-        email,
-        name
-      },
-      token
+        email: normalizedEmail,
+        name: trimmedName
+      }
     });
 
   } catch (error) {
@@ -85,59 +98,51 @@ router.post('/register', async (req, res) => {
   }
 });
 
-/**
- * POST /api/auth/login
- * Přihlášení uživatele
- */
 router.post('/login', loginLimiter, async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
 
-    // Validace vstupů
-    if (!email || !password) {
-      return res.status(400).json({
-        error: 'Email a heslo jsou povinné'
-      });
+    if (typeof email !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({ error: 'Email a heslo jsou povinné' });
     }
+    if (email.length > 254 || password.length > 128) {
+      return res.status(400).json({ error: 'Nesprávný email nebo heslo' });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
 
     const db = getDatabase();
 
-    // Najít uživatele podle emailu
     const user = await db.get(
       'SELECT * FROM users WHERE email = ?',
-      [email]
+      [normalizedEmail]
     );
 
     if (!user) {
-      return res.status(401).json({
-        error: 'Nesprávný email nebo heslo'
-      });
+      return res.status(401).json({ error: 'Nesprávný email nebo heslo' });
     }
 
-    // Ověření hesla
     const isPasswordValid = await comparePassword(password, user.password_hash);
 
     if (!isPasswordValid) {
-      return res.status(401).json({
-        error: 'Nesprávný email nebo heslo'
-      });
+      return res.status(401).json({ error: 'Nesprávný email nebo heslo' });
     }
 
-    // Vygenerování JWT tokenu
     const token = generateToken({
       id: user.id,
-      email: user.email
+      email: user.email,
+      name: user.name
     });
 
-    // Vrácení odpovědi
+    setAuthCookie(res, token);
+
     res.json({
       message: 'Přihlášení úspěšné',
       user: {
         id: user.id,
         email: user.email,
         name: user.name
-      },
-      token
+      }
     });
 
   } catch (error) {
@@ -148,5 +153,26 @@ router.post('/login', loginLimiter, async (req, res) => {
   }
 });
 
-export default router;
+router.post('/logout', (req, res) => {
+  res.clearCookie(COOKIE_TOKEN_NAME, { ...cookieOptions, maxAge: undefined });
+  res.json({ message: 'Odhlášeno' });
+});
 
+router.get('/me', authenticateToken, async (req, res) => {
+  try {
+    const db = getDatabase();
+    const user = await db.get(
+      'SELECT id, email, name FROM users WHERE id = ?',
+      [req.user.id]
+    );
+    if (!user) {
+      return res.status(404).json({ error: 'Uživatel nenalezen' });
+    }
+    res.json({ user });
+  } catch (error) {
+    console.error('Chyba při načítání profilu:', error);
+    res.status(500).json({ error: 'Nepodařilo se načíst profil' });
+  }
+});
+
+export default router;

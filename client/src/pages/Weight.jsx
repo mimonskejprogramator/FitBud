@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Line } from 'react-chartjs-2';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/ui/skeleton';
 import EmptyState from '../components/EmptyState';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Scale, Trash2 } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { API_URL } from "@/lib/api";
+import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api';
 
 function Weight() {
   const navigate = useNavigate();
@@ -27,14 +27,9 @@ function Weight() {
 
   const loadLogs = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
       const res = await fetch(`${API_URL}/api/weight`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+        credentials: 'include',
+              });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Chyba při načítání');
       setLogs(data.logs);
@@ -49,12 +44,11 @@ function Weight() {
     e.preventDefault();
     setError('');
     try {
-      const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/api/weight`, {
+        credentials: 'include',
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ weight_kg: weight, log_date: logDate, notes })
       });
@@ -71,11 +65,10 @@ function Weight() {
 
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem('token');
       const res = await fetch(`${API_URL}/api/weight/${id}`, {
+        credentials: 'include',
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+              });
       if (!res.ok) throw new Error('Mazání selhalo');
       toast({ title: "Záznam smazán" });
       setLogs(logs.filter(l => l.id !== id));
@@ -106,7 +99,6 @@ function Weight() {
     );
   }
 
-  // Data pro graf trendu - zobrazí všechny záznamy v pořadí podle data
   const chartData = {
     labels: logs.map(l => new Date(l.log_date).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'numeric' })),
     datasets: [{
@@ -125,7 +117,6 @@ function Weight() {
     scales: { y: { beginAtZero: false } }
   };
 
-  // Rozdíl od prvního záznamu, pro rychlý přehled trendu
   const diff = logs.length >= 2 ? (logs[logs.length - 1].weight_kg - logs[0].weight_kg).toFixed(1) : null;
 
   return (
@@ -241,4 +232,3 @@ function Weight() {
 }
 
 export default Weight;
-

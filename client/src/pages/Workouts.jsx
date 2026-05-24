@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { exportWorkouts } from '../utils/exportCSV';
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/ui/skeleton';
 import EmptyState from '../components/EmptyState';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dumbbell, Plus, Download, Pencil, Trash2, Clock, Flame } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
-import { API_URL } from "@/lib/api";
+import { useToast } from '@/hooks/use-toast';
+import { API_URL } from '@/lib/api';
 
 function Workouts() {
   const navigate = useNavigate();
@@ -24,17 +24,9 @@ function Workouts() {
 
   const loadWorkouts = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-        return;
-      }
-
       const response = await fetch(`${API_URL}/api/workouts`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+        credentials: 'include',
+              });
 
       const data = await response.json();
 
@@ -42,7 +34,6 @@ function Workouts() {
         throw new Error(data.error || 'Nepodařilo se načíst tréninky');
       }
 
-      // Seřazení podle data
       const sortedWorkouts = data.workouts.sort((a, b) => {
         const dateA = new Date(a.workout_date + ' ' + (a.workout_time || '00:00'));
         const dateB = new Date(b.workout_date + ' ' + (b.workout_time || '00:00'));
@@ -59,13 +50,10 @@ function Workouts() {
 
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/workouts/${id}`, {
+        credentials: 'include',
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+              });
 
       if (!response.ok) {
         throw new Error('Nepodařilo se smazat trénink');
@@ -83,7 +71,6 @@ function Workouts() {
     return date.toLocaleDateString('cs-CZ');
   };
 
-  // Překlad typu tréninku
   const getWorkoutTypeLabel = (type) => {
     const types = {
       'cardio': 'Kardio',
@@ -117,7 +104,7 @@ function Workouts() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 md:p-6 space-y-6">
-        {/* Header */}
+
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
@@ -153,7 +140,6 @@ function Workouts() {
           </Card>
         )}
 
-        {/* Seznam tréninků */}
         {workouts.length === 0 ? (
           <EmptyState
             title="Zatím žádné tréninky"

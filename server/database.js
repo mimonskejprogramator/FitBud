@@ -1,55 +1,88 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import pg from 'pg';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { Pool } = pg;
 
-// Cesta k databázi - buď z env nebo defaultní
-const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data', 'fitbud.db');
+let pool = null;
 
-let db = null;
+function buildPool() {
+  if (process.env.DATABASE_URL) {
+    return new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.PGSSL === 'true' ? { rejectUnauthorized: false } : false,
+      max: 10
+    });
+  }
+  return new Pool({
+    host: process.env.PGHOST || 'localhost',
+    port: parseInt(process.env.PGPORT || '5432'),
+    user: process.env.PGUSER || 'fitbud',
+    password: process.env.PGPASSWORD || 'fitbud',
+    database: process.env.PGDATABASE || 'fitbud',
+    max: 10
+  });
+}
 
-// Inicializace databáze
+function convertPlaceholders(sql) {
+  let i = 0;
+  return sql.replace(/\?/g, () => `$${++i}`);
+}
+
+function wrap(rawPool) {
+  return {
+    async run(sql, params = []) {
+      const converted = convertPlaceholders(sql);
+      const isInsert = /^\s*INSERT\s/i.test(converted);
+      const finalSql = isInsert && !/RETURNING\s/i.test(converted)
+        ? `${converted} RETURNING id`
+        : converted;
+      const result = await rawPool.query(finalSql, params);
+      return {
+        lastID: result.rows[0]?.id,
+        changes: result.rowCount
+      };
+    },
+    async get(sql, params = []) {
+      const result = await rawPool.query(convertPlaceholders(sql), params);
+      return result.rows[0];
+    },
+    async all(sql, params = []) {
+      const result = await rawPool.query(convertPlaceholders(sql), params);
+      return result.rows;
+    },
+    async exec(sql) {
+      await rawPool.query(sql);
+    }
+  };
+}
+
 export async function initDatabase() {
   try {
-    // Otevření/vytvoření databáze
-    db = await open({
-      filename: DB_PATH,
-      driver: sqlite3.Database
-    });
-
-    console.log(`📦 Databáze připojena: ${DB_PATH}`);
-
-    // Vytvoření tabulek
+    pool = buildPool();
+    await pool.query('SELECT 1');
+    console.log('📦 Databáze připojena (PostgreSQL)');
     await createTables();
-    
-    return db;
+    return wrap(pool);
   } catch (error) {
     console.error('❌ Chyba při inicializaci databáze:', error);
     throw error;
   }
 }
 
-// Vytvoření tabulek
 async function createTables() {
-  // Tabulka uživatelů
-  await db.exec(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       name TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
 
-  // Tabulka jídel (meals)
-  await db.exec(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS meals (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       name TEXT NOT NULL,
       calories INTEGER NOT NULL,
       protein REAL DEFAULT 0,
@@ -58,16 +91,14 @@ async function createTables() {
       meal_date DATE NOT NULL,
       meal_time TIME,
       notes TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
 
-  // Tabulka tréninků (workouts)
-  await db.exec(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS workouts (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       name TEXT NOT NULL,
       workout_type TEXT,
       duration_minutes INTEGER NOT NULL,
@@ -75,62 +106,53 @@ async function createTables() {
       workout_date DATE NOT NULL,
       workout_time TIME,
       notes TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
 
-  // Tabulka spánku (sleep)
-  await db.exec(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS sleep (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       sleep_date DATE NOT NULL,
       bedtime TIME,
       wake_time TIME,
       duration_hours REAL,
       quality TEXT,
       notes TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
 
-  // Tabulka pitného režimu - každý záznam = jeden hlt/sklenice
-  await db.exec(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS water_logs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       amount_ml INTEGER NOT NULL,
       log_date DATE NOT NULL,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
 
-  // Tabulka záznamů váhy - jeden záznam za měření (typicky ráno)
-  await db.exec(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS weight_logs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       weight_kg REAL NOT NULL,
       log_date DATE NOT NULL,
       notes TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
 
   console.log('✅ Databázové tabulky vytvořeny/ověřeny');
 }
 
-// Export databázového objektu
 export function getDatabase() {
-  if (!db) {
+  if (!pool) {
     throw new Error('Databáze není inicializována. Zavolej initDatabase() nejdřív.');
   }
-  return db;
+  return wrap(pool);
 }
 
 export default { initDatabase, getDatabase };
-

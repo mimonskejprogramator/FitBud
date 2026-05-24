@@ -1,7 +1,24 @@
-version: '3.8'
-
 services:
-  # Backend API
+  db:
+    image: postgres:16-alpine
+    container_name: fitbud-db
+    environment:
+      POSTGRES_USER: ${PGUSER:-fitbud}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-fitbud}
+      POSTGRES_DB: ${PGDATABASE:-fitbud}
+    ports:
+      - "5432:5432"
+    volumes:
+      - fitbud-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-fitbud} -d ${PGDATABASE:-fitbud}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - fitbud-network
+
   server:
     build:
       context: ./server
@@ -9,19 +26,23 @@ services:
     container_name: fitbud-server
     ports:
       - "3000:3000"
-    volumes:
-      - ./server:/app
-      - /app/node_modules
-      - fitbud-data:/app/data
     environment:
-      - NODE_ENV=development
-      - PORT=3000
-      - DB_PATH=/app/data/fitbud.db
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: ${PGUSER:-fitbud}
+      PGPASSWORD: ${PGPASSWORD:-fitbud}
+      PGDATABASE: ${PGDATABASE:-fitbud}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET musi byt nastaven v .env}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - fitbud-network
 
-  # Frontend React app
   client:
     build:
       context: ./client
@@ -29,9 +50,8 @@ services:
     container_name: fitbud-client
     ports:
       - "5173:5173"
-    volumes:
-      - ./client:/app
-      - /app/node_modules
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
     depends_on:
       - server
     restart: unless-stopped
@@ -39,7 +59,7 @@ services:
       - fitbud-network
 
 volumes:
-  fitbud-data:
+  fitbud-pgdata:
     driver: local
 
 networks:

@@ -1,4 +1,4 @@
-// Jednoduchá loading komponenta - zobrazuje se při načítání dat
+
 function Loading({ message = 'Načítám...' }) {
   return (
     <div style={{
@@ -9,7 +9,7 @@ function Loading({ message = 'Načítám...' }) {
       minHeight: '300px',
       padding: '40px'
     }}>
-      {/* Animovaný spinner */}
+
       <div style={{
         width: '50px',
         height: '50px',
@@ -25,8 +25,7 @@ function Loading({ message = 'Načítám...' }) {
       }}>
         {message}
       </p>
-      
-      {/* CSS animace pro spinner */}
+
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
@@ -38,4 +37,3 @@ function Loading({ message = 'Načítám...' }) {
 }
 
 export default Loading;
-

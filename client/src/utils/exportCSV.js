@@ -1,21 +1,16 @@
-import { API_URL } from "../lib/api";
+import { API_URL } from '../lib/api';
 
-// Pomocné funkce pro export dat do CSV formátu
-
-// Převod pole objektů na CSV string
 export const convertToCSV = (data, headers) => {
   if (!data || data.length === 0) {
     return '';
   }
 
-  // Hlavička CSV
   const headerRow = headers.join(',');
-  
-  // Řádky s daty
+
   const rows = data.map(item => {
     return headers.map(header => {
       const value = item[header] || '';
-      // Escapování hodnot s čárkami nebo uvozovkami
+
       if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
         return `"${value.replace(/"/g, '""')}"`;
       }
@@ -26,13 +21,12 @@ export const convertToCSV = (data, headers) => {
   return [headerRow, ...rows].join('\n');
 };
 
-// Stažení CSV souboru
 export const downloadCSV = (csvContent, filename) => {
-  // Přidání BOM pro správné zobrazení češtiny v Excelu
+
   const BOM = '\uFEFF';
   const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
-  
+
   if (link.download !== undefined) {
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
@@ -44,7 +38,6 @@ export const downloadCSV = (csvContent, filename) => {
   }
 };
 
-// Export jídel
 export const exportMeals = (meals) => {
   if (!meals || meals.length === 0) {
     alert('Žádná data k exportu');
@@ -56,7 +49,6 @@ export const exportMeals = (meals) => {
   downloadCSV(csvContent, filename);
 };
 
-// Export tréninků
 export const exportWorkouts = (workouts) => {
   if (!workouts || workouts.length === 0) {
     alert('Žádná data k exportu');
@@ -68,7 +60,6 @@ export const exportWorkouts = (workouts) => {
   downloadCSV(csvContent, filename);
 };
 
-// Export spánku
 export const exportSleep = (sleepRecords) => {
   if (!sleepRecords || sleepRecords.length === 0) {
     alert('Žádná data k exportu');
@@ -80,34 +71,34 @@ export const exportSleep = (sleepRecords) => {
   downloadCSV(csvContent, filename);
 };
 
-// Export všech dat najednou
 export const exportAllData = async (token) => {
   try {
-    // Načtení všech dat
+
     const [mealsRes, workoutsRes, sleepRes] = await Promise.all([
-      fetch(`${API_URL}/api/meals`, { headers: { 'Authorization': `Bearer ${token}` } }),
-      fetch(`${API_URL}/api/workouts`, { headers: { 'Authorization': `Bearer ${token}` } }),
-      fetch(`${API_URL}/api/sleep`, { headers: { 'Authorization': `Bearer ${token}` } })
+      fetch(`${API_URL}/api/meals`, {
+        credentials: 'include', headers: { } }),
+      fetch(`${API_URL}/api/workouts`, {
+        credentials: 'include', headers: { } }),
+      fetch(`${API_URL}/api/sleep`, {
+        credentials: 'include', headers: { } })
     ]);
 
     const mealsData = await mealsRes.json();
     const workoutsData = await workoutsRes.json();
     const sleepData = await sleepRes.json();
 
-    // Export každé kategorie
     if (mealsData.meals && mealsData.meals.length > 0) {
       exportMeals(mealsData.meals);
     }
-    
-    // Malá pauza mezi staženími
+
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     if (workoutsData.workouts && workoutsData.workouts.length > 0) {
       exportWorkouts(workoutsData.workouts);
     }
-    
+
     await new Promise(resolve => setTimeout(resolve, 300));
-    
+
     if (sleepData.sleep && sleepData.sleep.length > 0) {
       exportSleep(sleepData.sleep);
     }
@@ -118,4 +109,3 @@ export const exportAllData = async (token) => {
     return { success: false, message: 'Nepodařilo se exportovat data' };
   }
 };
-
